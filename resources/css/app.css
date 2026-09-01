@@ -1,0 +1,1183 @@
+:root {
+    /* =========================================================
+       CRB BRAND COLORS
+    ========================================================= */
+
+    --crb-teal: #246d69;
+    --crb-teal-dark: #1d625f;
+    --crb-teal-deep: #174c49;
+
+    --crb-mint: #c9ff83;
+    --crb-mint-soft: #e7f4dc;
+
+    /* =========================================================
+       BACKGROUNDS
+    ========================================================= */
+
+    --crb-bg: #e9efed;
+    --crb-surface: #f5f8f7;
+    --crb-surface-alt: #edf3f1;
+
+    /* =========================================================
+       TEXT
+    ========================================================= */
+
+    --crb-text: #263238;
+    --crb-muted: #788684;
+
+    /* =========================================================
+       BORDERS
+    ========================================================= */
+
+    --crb-border: #dbe4e1;
+
+    /* =========================================================
+       FONTS
+    ========================================================= */
+
+    --crb-heading-font:
+        "Bookman Old Style",
+        "Palatino Linotype",
+        Georgia,
+        serif;
+
+    --crb-body-font:
+        "Segoe UI",
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background: var(--crb-bg);
+    color: var(--crb-text);
+
+    font-family: var(--crb-body-font);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--crb-heading-font);
+    color: var(--crb-teal-deep);
+}
+
+button,
+input,
+select,
+textarea,
+table {
+    font-family: var(--crb-body-font);
+}
+
+
+/* =========================================================
+   APPLICATION
+========================================================= */
+
+.crb-app {
+    min-height: 100vh;
+    display: flex;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.crb-sidebar {
+    width: 230px;
+    min-height: 100vh;
+
+    background: var(--crb-teal);
+    color: white;
+
+    padding: 18px 12px;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    z-index: 1000;
+
+    box-shadow: 3px 0 12px rgba(22, 66, 62, 0.08);
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.crb-brand {
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 12px;
+    margin-bottom: 18px;
+}
+
+.crb-brand-icon {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    margin-right: 10px;
+}
+
+.crb-brand-text {
+    line-height: 1.1;
+}
+
+.crb-brand-text strong {
+    display: block;
+
+    font-family: var(--crb-heading-font);
+
+    font-size: 14px;
+    letter-spacing: 0.2px;
+}
+
+.crb-brand-text span {
+    display: block;
+
+    font-size: 10px;
+
+    opacity: 0.75;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   SIDEBAR SECTIONS
+========================================================= */
+
+.crb-sidebar-section {
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    opacity: 0.55;
+
+    padding: 18px 12px 7px;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.crb-nav {
+    list-style: none;
+
+    padding: 0;
+    margin: 0;
+}
+
+.crb-nav li {
+    margin-bottom: 3px;
+}
+
+.crb-nav a {
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+
+    text-decoration: none;
+
+    color: rgba(255, 255, 255, 0.78);
+
+    padding: 9px 12px;
+
+    border-radius: 10px;
+
+    transition: all 0.2s ease;
+
+    font-size: 13px;
+}
+
+.crb-nav a i {
+    width: 18px;
+
+    text-align: center;
+
+    font-size: 15px;
+}
+
+.crb-nav a:hover {
+    background: rgba(255, 255, 255, 0.10);
+
+    color: white;
+
+    transform: translateX(2px);
+}
+
+.crb-nav a.active {
+    background: var(--crb-mint);
+
+    color: #31513e;
+
+    font-weight: 600;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================================================
+   MAIN AREA
+========================================================= */
+
+.crb-main {
+    margin-left: 230px;
+
+    width: calc(100% - 230px);
+
+    min-height: 100vh;
+
+    background: var(--crb-bg);
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.crb-topbar {
+    height: 66px;
+
+    background: var(--crb-surface);
+
+    border-bottom: 1px solid var(--crb-border);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 28px;
+
+    box-shadow: 0 1px 5px rgba(35, 75, 70, 0.025);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.crb-search {
+    width: 270px;
+    position: relative;
+}
+
+.crb-search i {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #9aa2a4;
+}
+
+.crb-search input {
+    width: 100%;
+
+    border: 1px solid transparent;
+
+    background: var(--crb-surface-alt);
+
+    border-radius: 8px;
+
+    padding: 9px 12px 9px 35px;
+
+    font-size: 12px;
+
+    color: var(--crb-text);
+
+    outline: none;
+
+    transition: all 0.2s ease;
+}
+
+.crb-search input::placeholder {
+    color: #9aa2a4;
+}
+
+.crb-search input:focus {
+    background: #f8faf9;
+
+    border-color: #cddbd7;
+
+    box-shadow: 0 0 0 3px rgba(36, 109, 105, 0.08);
+}
+
+
+/* =========================================================
+   TOPBAR RIGHT
+========================================================= */
+
+.crb-topbar-right {
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+}
+
+.crb-notification {
+    color: #70797b;
+
+    font-size: 17px;
+
+    transition: 0.2s ease;
+}
+
+.crb-notification:hover {
+    color: var(--crb-teal);
+}
+
+
+/* =========================================================
+   USER
+========================================================= */
+
+.crb-user {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+}
+
+.crb-user-avatar {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: var(--crb-teal);
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.crb-user-info {
+    line-height: 1.2;
+}
+
+.crb-user-info strong {
+    display: block;
+
+    font-size: 12px;
+
+    color: var(--crb-text);
+}
+
+.crb-user-info span {
+    display: block;
+
+    color: var(--crb-muted);
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.crb-content {
+    padding: 28px;
+
+    background: var(--crb-bg);
+}
+
+
+/* =========================================================
+   PAGE TITLE
+========================================================= */
+
+.crb-page-title {
+    margin-bottom: 24px;
+}
+
+.crb-page-title h1 {
+    font-family: var(--crb-heading-font);
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.2px;
+
+    color: var(--crb-teal-deep);
+
+    margin: 0 0 5px;
+}
+
+.crb-page-title p {
+    color: var(--crb-muted);
+
+    margin: 0;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   STAT CARDS
+========================================================= */
+
+.crb-stat-card {
+    background: var(--crb-surface);
+
+    border: 1px solid var(--crb-border);
+
+    border-radius: 11px;
+
+    padding: 18px;
+
+    height: 100%;
+
+    box-shadow: 0 2px 8px rgba(35, 75, 70, 0.04);
+
+    transition: all 0.2s ease;
+}
+
+.crb-stat-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 15px rgba(35, 75, 70, 0.07);
+}
+
+.crb-stat-top {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.crb-stat-icon {
+    width: 35px;
+    height: 35px;
+
+    border-radius: 8px;
+
+    background: var(--crb-mint-soft);
+
+    color: var(--crb-teal);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.crb-stat-value {
+    font-size: 22px;
+
+    font-weight: 600;
+
+    margin-top: 12px;
+
+    color: var(--crb-teal-deep);
+}
+
+.crb-stat-label {
+    font-size: 11px;
+
+    color: var(--crb-muted);
+}
+
+.crb-stat-change {
+    font-size: 10px;
+
+    color: #2c9b70;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.crb-card {
+    background: var(--crb-surface);
+
+    border: 1px solid var(--crb-border);
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 12px rgba(35, 75, 70, 0.045);
+}
+
+.crb-card-header {
+    padding: 18px 22px;
+
+    border-bottom: 1px solid var(--crb-border);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: var(--crb-surface);
+}
+
+.crb-card-header h5 {
+    margin: 0;
+
+    font-family: var(--crb-heading-font);
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color: var(--crb-teal-deep);
+}
+
+.crb-card-header small {
+    color: var(--crb-muted);
+
+    font-size: 11px;
+}
+
+.crb-card-body {
+    padding: 18px;
+
+    background: var(--crb-surface);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.crb-table {
+    margin: 0;
+
+    color: #405250;
+
+    font-family: var(--crb-body-font);
+
+    font-size: 13px;
+}
+
+.crb-table thead th {
+    background: var(--crb-surface-alt);
+
+    color: #687875;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.06em;
+
+    padding: 13px 18px;
+
+    border-bottom: 1px solid var(--crb-border);
+
+    white-space: nowrap;
+}
+
+.crb-table tbody td {
+    background: var(--crb-surface);
+
+    padding: 14px 18px;
+
+    border-bottom: 1px solid #e4ebe8;
+
+    font-size: 13px;
+
+    color: #405250;
+
+    vertical-align: middle;
+}
+
+.crb-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.crb-table tbody tr:hover td {
+    background: #e8f1ee;
+}
+
+
+/* =========================================================
+   ASSET CODE
+========================================================= */
+
+.crb-asset-code {
+    color: var(--crb-teal);
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    transition: 0.2s ease;
+}
+
+.crb-asset-code:hover {
+    color: var(--crb-teal-dark);
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   MUTED TEXT
+========================================================= */
+
+.crb-muted {
+    color: var(--crb-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   EMPLOYEE
+========================================================= */
+
+.crb-employee {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.crb-avatar {
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background: var(--crb-mint-soft);
+
+    color: var(--crb-teal);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.crb-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.crb-status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+.crb-status.available {
+    background: #e4f5ec;
+    color: #248454;
+}
+
+.crb-status.assigned {
+    background: #e3f0f2;
+    color: #287178;
+}
+
+.crb-status.repair {
+    background: #fff3d8;
+    color: #a47718;
+}
+
+.crb-status.retired {
+    background: #eef0f1;
+    color: #727b7d;
+}
+
+.crb-status.disposed {
+    background: #eef0f1;
+    color: #666f71;
+}
+
+.crb-status.lost {
+    background: #fde7e7;
+    color: #c24d4d;
+}
+
+.crb-status.default {
+    background: #f0f2f2;
+    color: #697575;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.crb-actions {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+.crb-action-btn {
+    width: 31px;
+    height: 31px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--crb-border);
+
+    background: var(--crb-surface-alt);
+
+    color: #617070;
+
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.crb-action-btn:hover {
+    background: var(--crb-mint-soft);
+
+    border-color: #c9ded8;
+
+    color: var(--crb-teal);
+
+    transform: translateY(-1px);
+}
+
+.crb-action-btn.danger:hover {
+    background: #fff0f0;
+
+    border-color: #f0cccc;
+
+    color: #c24d4d;
+}
+
+
+/* =========================================================
+   CRB BUTTON
+========================================================= */
+
+.btn-crb {
+    background: var(--crb-teal);
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    padding: 8px 14px;
+
+    font-family: var(--crb-body-font);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+
+    box-shadow: 0 2px 5px rgba(36, 109, 105, 0.12);
+}
+
+.btn-crb:hover {
+    background: var(--crb-teal-dark);
+
+    color: white;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 9px rgba(36, 109, 105, 0.18);
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.crb-pagination {
+    padding: 15px 20px;
+
+    border-top: 1px solid var(--crb-border);
+
+    background: var(--crb-surface);
+}
+
+.crb-pagination nav {
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.crb-empty-state {
+    text-align: center;
+
+    padding: 70px 20px;
+
+    background: var(--crb-surface);
+}
+
+.crb-empty-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 18px;
+
+    background: var(--crb-mint-soft);
+
+    color: var(--crb-teal);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 30px;
+}
+
+.crb-empty-state h4 {
+    color: var(--crb-teal-deep);
+
+    font-family: var(--crb-heading-font);
+
+    font-weight: 700;
+
+    font-size: 19px;
+}
+
+.crb-empty-state p {
+    color: var(--crb-muted);
+
+    margin-bottom: 20px;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FORM ELEMENTS
+========================================================= */
+
+.form-control,
+.form-select {
+    background: var(--crb-surface);
+
+    border: 1px solid var(--crb-border);
+
+    border-radius: 7px;
+
+    font-family: var(--crb-body-font);
+
+    font-size: 13px;
+
+    color: var(--crb-text);
+
+    padding: 9px 11px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: #f8faf9;
+
+    border-color: var(--crb-teal);
+
+    box-shadow: 0 0 0 3px rgba(36, 109, 105, 0.08);
+}
+
+.form-label {
+    font-family: var(--crb-body-font);
+
+    color: #536360;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    margin-bottom: 6px;
+}
+
+
+/* =========================================================
+   FORM CARDS
+========================================================= */
+
+.crb-form-card {
+    background: var(--crb-surface);
+
+    border: 1px solid var(--crb-border);
+
+    border-radius: 12px;
+
+    padding: 24px;
+
+    box-shadow: 0 3px 12px rgba(35, 75, 70, 0.045);
+}
+
+.crb-form-section {
+    padding-bottom: 20px;
+
+    margin-bottom: 22px;
+
+    border-bottom: 1px solid var(--crb-border);
+}
+
+.crb-form-section:last-child {
+    border-bottom: none;
+
+    margin-bottom: 0;
+
+    padding-bottom: 0;
+}
+
+.crb-form-section-title {
+    font-family: var(--crb-heading-font);
+
+    color: var(--crb-teal-deep);
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    margin-bottom: 16px;
+}
+
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.alert {
+    border-radius: 8px;
+
+    font-family: var(--crb-body-font);
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   BOOTSTRAP OVERRIDES
+========================================================= */
+
+.btn-primary {
+    background-color: var(--crb-teal);
+    border-color: var(--crb-teal);
+
+    font-family: var(--crb-body-font);
+
+    font-weight: 600;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--crb-teal-dark);
+    border-color: var(--crb-teal-dark);
+}
+
+.card {
+    background: var(--crb-surface);
+
+    border-color: var(--crb-border);
+}
+
+.card-header,
+.card-footer {
+    background: var(--crb-surface) !important;
+
+    border-color: var(--crb-border);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 992px) {
+
+    .crb-sidebar {
+        width: 200px;
+    }
+
+    .crb-main {
+        margin-left: 200px;
+
+        width: calc(100% - 200px);
+    }
+
+    .crb-content {
+        padding: 20px;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .crb-sidebar {
+        position: relative;
+
+        width: 100%;
+
+        min-height: auto;
+    }
+
+    .crb-main {
+        margin-left: 0;
+
+        width: 100%;
+    }
+
+    .crb-app {
+        display: block;
+    }
+
+    .crb-topbar {
+        padding: 0 15px;
+    }
+
+    .crb-search {
+        width: 180px;
+    }
+
+    .crb-content {
+        padding: 15px;
+    }
+
+    .crb-page-title h1 {
+        font-size: 22px;
+    }
+
+    .crb-card {
+        border-radius: 9px;
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .crb-topbar {
+        height: auto;
+
+        min-height: 60px;
+
+        gap: 10px;
+
+        padding: 10px 15px;
+    }
+
+    .crb-search {
+        width: 150px;
+    }
+
+    .crb-user-info {
+        display: none;
+    }
+
+    .crb-content {
+        padding: 12px;
+    }
+
+    .crb-page-title h1 {
+        font-size: 20px;
+    }
+
+    .btn-crb {
+        white-space: nowrap;
+    }
+}
