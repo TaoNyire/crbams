@@ -145,9 +145,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | System Administrator    → READ-ONLY oversight
     |
     */
-
+    Route::get('/assets/tags/bulk', [AssetController::class, 'bulkTags'])
+        ->name('assets.tags.bulk');
     Route::resource('assets', AssetController::class);
-
+    Route::get('/assets/{asset}/tag', [AssetController::class, 'tag'])
+    ->name('assets.tag');
 
     /*
     |--------------------------------------------------------------------------
