@@ -161,7 +161,7 @@ class AssetController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $employees = Employee::orderBy('full_name')->get();
+        $employees = Employee::orderBy('last_name')->get();
 
         return view('assets.create', compact(
             'categories',
@@ -434,7 +434,7 @@ class AssetController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $employees = Employee::orderBy('full_name')->get();
+        $employees = Employee::orderBy('last_name')->get();
 
         return view('assets.edit', compact(
             'asset',
