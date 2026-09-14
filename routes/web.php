@@ -8,7 +8,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AssetAssignmentController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -159,7 +159,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | We will later restrict category management to System Administrator.
     |
     */
+Route::get(
+    '/assets/{asset}/assign',
+    [AssetAssignmentController::class, 'create']
+)->name('assets.assign');
 
+Route::post(
+    '/assets/{asset}/assign',
+    [AssetAssignmentController::class, 'store']
+)->name('assets.assign.store');
+
+Route::post(
+    '/assets/{asset}/return',
+    [AssetAssignmentController::class, 'returnAsset']
+)->name('assets.return');
     Route::resource(
         'asset-categories',
         AssetCategoryController::class

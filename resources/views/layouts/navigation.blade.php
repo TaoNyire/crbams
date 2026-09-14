@@ -97,8 +97,8 @@ HARDWARE OFFICER
         </li>
 
         <li>
-            <a href="#">
-                <i class="bi bi-tools"></i>
+           href="{{ route('assets.assign') }}"
+                class="{{ request()->routeIs('assets.assign') ? 'active' : '' }}"
                 <span>Maintenance</span>
             </a>
         </li>
