@@ -75,17 +75,13 @@ class DashboardController extends Controller
 
         $totalStaff = Employee::count();
 
-        $activeStaff = Employee::where('is_active', true)
-            ->count();
+        $activeStaff = Employee::where('is_active', true)->count();
 
-        $inactiveStaff = Employee::where('is_active', false)
-            ->count();
+        $inactiveStaff = Employee::where('is_active', false)->count();
 
         $totalDepartments = Department::count();
 
-        $activeDepartments = Department::where('is_active', true)
-            ->count();
-
+        $activeDepartments = Department::where('is_active', true)->count();
 
         /*
         |--------------------------------------------------------------------------
@@ -102,7 +98,6 @@ class DashboardController extends Controller
             ->get()
             ->countBy('role');
 
-
         /*
         |--------------------------------------------------------------------------
         | ASSET OVERSIGHT
@@ -111,23 +106,23 @@ class DashboardController extends Controller
 
         $totalAssets = Asset::count();
 
-        $hardwareAssets = $this->assetsFor('hardware')
-            ->count();
+        $hardwareAssets = $this->assetsFor('hardware')->count();
 
-        $administrationAssets = $this->assetsFor('administration')
-            ->count();
+        $administrationAssets = $this->assetsFor('administration')->count();
 
-        $assignedAssets = Asset::whereNotNull('employee_id')
-            ->count();
+        $availableAssets = Asset::where(
+            'status',
+            'available'
+        )->count();
 
-        $unassignedAssets = Asset::whereNull('employee_id')
-            ->count();
+        $assignedAssets = Asset::whereNotNull('employee_id')->count();
+
+        $unassignedAssets = Asset::whereNull('employee_id')->count();
 
         $repairAssets = Asset::where(
             'status',
             'under_repair'
         )->count();
-
 
         /*
         |--------------------------------------------------------------------------
@@ -146,14 +141,10 @@ class DashboardController extends Controller
             'department_id'
         )->count();
 
-
         /*
         |--------------------------------------------------------------------------
         | RECENT ASSETS
         |--------------------------------------------------------------------------
-        |
-        | These are READ-ONLY oversight records.
-        |
         */
 
         $recentAssets = Asset::query()
@@ -167,7 +158,6 @@ class DashboardController extends Controller
             ->take(8)
             ->get();
 
-
         /*
         |--------------------------------------------------------------------------
         | RECENT STAFF
@@ -179,7 +169,6 @@ class DashboardController extends Controller
             ->latest()
             ->take(5)
             ->get();
-
 
         /*
         |--------------------------------------------------------------------------
@@ -211,6 +200,7 @@ class DashboardController extends Controller
             'totalAssets' => $totalAssets,
             'hardwareAssets' => $hardwareAssets,
             'administrationAssets' => $administrationAssets,
+            'availableAssets' => $availableAssets,
             'assignedAssets' => $assignedAssets,
             'unassignedAssets' => $unassignedAssets,
             'repairAssets' => $repairAssets,

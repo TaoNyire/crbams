@@ -30,6 +30,7 @@
 
             </a>
 
+
             <a href="{{ route('employees.index') }}"
                class="btn btn-light">
 
@@ -69,6 +70,7 @@
 
                     </div>
 
+
                     <div class="crb-stat-value">
                         {{ $totalStaff }}
                     </div>
@@ -106,6 +108,7 @@
                         <i class="bi bi-arrow-up-right text-muted"></i>
 
                     </div>
+
 
                     <div class="crb-stat-value">
                         {{ $totalUsers }}
@@ -145,6 +148,7 @@
 
                     </div>
 
+
                     <div class="crb-stat-value">
                         {{ $totalAssets }}
                     </div>
@@ -182,6 +186,7 @@
                         <i class="bi bi-arrow-up-right text-muted"></i>
 
                     </div>
+
 
                     <div class="crb-stat-value">
                         {{ $totalDepartments }}
@@ -229,6 +234,7 @@
 
                     </div>
 
+
                     <a href="{{ route('employees.index') }}"
                        class="btn btn-sm btn-light">
 
@@ -244,6 +250,7 @@
                 <div class="crb-card-body">
 
                     <div class="row text-center">
+
 
                         {{-- TOTAL --}}
 
@@ -331,6 +338,7 @@
 
                     </div>
 
+
                     <a href="{{ route('users.index') }}"
                        class="btn btn-sm btn-light">
 
@@ -362,9 +370,7 @@
                             </span>
 
                             <strong>
-
                                 {{ $usersByRole->get('hardware_officer', 0) }}
-
                             </strong>
 
                         </div>
@@ -388,9 +394,7 @@
                             </span>
 
                             <strong>
-
                                 {{ $usersByRole->get('administration_officer', 0) }}
-
                             </strong>
 
                         </div>
@@ -414,9 +418,7 @@
                             </span>
 
                             <strong>
-
                                 {{ $usersByRole->get('system_admin', 0) }}
-
                             </strong>
 
                         </div>
@@ -455,6 +457,7 @@
 
                     </div>
 
+
                     <a href="{{ route('assets.index') }}"
                        class="btn btn-sm btn-light">
 
@@ -476,7 +479,7 @@
 
                         <div class="col-md-3">
 
-                            <a href="{{ route('assets.index') }}"
+                            <a href="{{ route('assets.index', ['management_area' => 'hardware']) }}"
                                class="text-decoration-none text-dark">
 
                                 <div class="border rounded p-3 h-100">
@@ -491,9 +494,11 @@
 
                                     </div>
 
+
                                     <div class="fs-3 fw-bold">
                                         {{ $hardwareAssets }}
                                     </div>
+
 
                                     <small class="text-muted">
                                         View hardware inventory
@@ -510,7 +515,7 @@
 
                         <div class="col-md-3">
 
-                            <a href="{{ route('assets.index') }}"
+                            <a href="{{ route('assets.index', ['management_area' => 'administration']) }}"
                                class="text-decoration-none text-dark">
 
                                 <div class="border rounded p-3 h-100">
@@ -525,9 +530,11 @@
 
                                     </div>
 
+
                                     <div class="fs-3 fw-bold">
                                         {{ $administrationAssets }}
                                     </div>
+
 
                                     <small class="text-muted">
                                         View administration inventory
@@ -544,7 +551,7 @@
 
                         <div class="col-md-3">
 
-                            <a href="{{ route('assets.index') }}"
+                            <a href="{{ route('assets.index', ['status' => 'assigned']) }}"
                                class="text-decoration-none text-dark">
 
                                 <div class="border rounded p-3 h-100">
@@ -559,9 +566,11 @@
 
                                     </div>
 
+
                                     <div class="fs-3 fw-bold">
                                         {{ $assignedAssets }}
                                     </div>
+
 
                                     <small class="text-muted">
                                         View assigned inventory
@@ -574,11 +583,11 @@
                         </div>
 
 
-                        {{-- UNASSIGNED ASSETS --}}
+                        {{-- AVAILABLE ASSETS --}}
 
                         <div class="col-md-3">
 
-                            <a href="{{ route('assets.index') }}"
+                            <a href="{{ route('assets.index', ['status' => 'available']) }}"
                                class="text-decoration-none text-dark">
 
                                 <div class="border rounded p-3 h-100">
@@ -586,19 +595,21 @@
                                     <div class="d-flex justify-content-between">
 
                                         <div class="text-muted small">
-                                            Unassigned Assets
+                                            Available Assets
                                         </div>
 
                                         <i class="bi bi-arrow-up-right text-muted"></i>
 
                                     </div>
 
+
                                     <div class="fs-3 fw-bold">
-                                        {{ $unassignedAssets }}
+                                        {{ $availableAssets }}
                                     </div>
 
+
                                     <small class="text-muted">
-                                        Review unassigned assets
+                                        View available inventory
                                     </small>
 
                                 </div>
@@ -664,6 +675,7 @@
 
                             </div>
 
+
                             <strong>
                                 {{ $inactiveStaffWithAssets }}
                             </strong>
@@ -688,6 +700,7 @@
 
                             </div>
 
+
                             <strong>
                                 {{ $assetsWithoutDepartment }}
                             </strong>
@@ -699,7 +712,7 @@
 
                     {{-- ASSETS UNDER REPAIR --}}
 
-                    <a href="{{ route('assets.index') }}"
+                    <a href="{{ route('assets.index', ['status' => 'under_repair']) }}"
                        class="text-decoration-none text-dark">
 
                         <div class="d-flex justify-content-between align-items-center">
@@ -711,6 +724,7 @@
                                 Assets under repair
 
                             </div>
+
 
                             <strong>
                                 {{ $repairAssets }}
@@ -744,6 +758,7 @@
                         </small>
 
                     </div>
+
 
                     <a href="{{ route('employees.index') }}"
                        class="btn btn-sm btn-light">
@@ -791,16 +806,12 @@
                                     <td>
 
                                         <strong>
-
                                             {{ $employee->first_name }}
                                             {{ $employee->last_name }}
-
                                         </strong>
 
                                         <div class="crb-muted">
-
                                             {{ $employee->employee_number }}
-
                                         </div>
 
                                     </td>
@@ -891,6 +902,7 @@
 
                     </div>
 
+
                     <a href="{{ route('assets.index') }}"
                        class="btn btn-sm btn-light">
 
@@ -950,6 +962,7 @@
                                             {{ $asset->asset_code }}
 
                                         </a>
+
 
                                         <div class="crb-muted">
 

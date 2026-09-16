@@ -97,9 +97,8 @@ HARDWARE OFFICER
         </li>
 
         <li>
-           href="{{ route('assets.assign') }}"
-                class="{{ request()->routeIs('assets.assign') ? 'active' : '' }}"
-                <span>Maintenance</span>
+           <a href="#">
+                <i class="bi bi-arrow-left-right"></i>                <span>Maintenance</span>
             </a>
         </li>
 
@@ -111,11 +110,15 @@ HARDWARE OFFICER
         </li>
 
         <li>
-            <a href="#">
-                <i class="bi bi-person-check"></i>
-                <span>Assignments</span>
-            </a>
-        </li>
+    <a href="{{ route('assignments.index') }}"
+       class="{{ request()->routeIs('assignments.*') ? 'active' : '' }}">
+
+        <i class="bi bi-arrow-left-right"></i>
+
+        <span>Assignments</span>
+
+    </a>
+</li>
 
     </ul>
 

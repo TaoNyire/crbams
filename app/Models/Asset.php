@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Asset extends Model
 {
     protected $fillable = [
@@ -35,32 +35,36 @@ class Asset extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
+public function category(): BelongsTo
+{
+    return $this->belongsTo(
+        AssetCategory::class,
+        'asset_category_id'
+    );
+}
 
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(
-            AssetCategory::class,
-            'asset_category_id'
-        );
-    }
+public function type(): BelongsTo
+{
+    return $this->belongsTo(
+        AssetType::class,
+        'asset_type_id'
+    );
+}
 
-    public function type(): BelongsTo
-    {
-        return $this->belongsTo(
-            AssetType::class,
-            'asset_type_id'
-        );
-    }
+public function department(): BelongsTo
+{
+    return $this->belongsTo(Department::class);
+}
 
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
-    }
+public function employee(): BelongsTo
+{
+    return $this->belongsTo(Employee::class);
+}
 
-    public function employee(): BelongsTo
-    {
-        return $this->belongsTo(Employee::class);
-    }
+public function assignments(): HasMany
+{
+    return $this->hasMany(AssetAssignment::class);
+}
 
     /*
     |--------------------------------------------------------------------------

@@ -63,6 +63,35 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | Management Area Filter
+        |--------------------------------------------------------------------------
+        | Used by the System Administrator dashboard.
+        |
+        | System Administrator can filter all assets by:
+        | - hardware
+        | - administration
+        |
+        | Operational officers cannot use this filter to bypass
+        | their existing access restrictions because the base query
+        | is already restricted by assetsForCurrentUser().
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $request->filled('management_area') &&
+            auth()->user()->role === 'system_admin'
+        ) {
+            $managementArea = $request->management_area;
+
+            if (in_array($managementArea, ['hardware', 'administration'], true)) {
+                $query->whereHas('category', function (Builder $q) use ($managementArea) {
+                    $q->where('responsible_officer', $managementArea);
+                });
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | Pagination
         |--------------------------------------------------------------------------
         */
@@ -91,6 +120,35 @@ class AssetController extends Controller
         */
 
         $accessibleAssets = $this->assetsForCurrentUser();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Apply Management Area to Statistics
+        |--------------------------------------------------------------------------
+        | This keeps the statistics consistent with the assets currently
+        | being displayed when the System Administrator clicks a
+        | management-area dashboard card.
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $request->filled('management_area') &&
+            auth()->user()->role === 'system_admin'
+        ) {
+            $managementArea = $request->management_area;
+
+            if (in_array($managementArea, ['hardware', 'administration'], true)) {
+                $accessibleAssets->whereHas(
+                    'category',
+                    function (Builder $q) use ($managementArea) {
+                        $q->where(
+                            'responsible_officer',
+                            $managementArea
+                        );
+                    }
+                );
+            }
+        }
 
         $totalAssets = (clone $accessibleAssets)->count();
 
@@ -339,8 +397,11 @@ class AssetController extends Controller
         | QR Destination
         |--------------------------------------------------------------------------
         |
-        | The QR code points to the asset record.
+        | The QR code currently points to the asset record.
         |
+        | We will later replace this with a dedicated secure scan route
+        | so that the physical CRB asset tag can be scanned safely.
+        |--------------------------------------------------------------------------
         */
 
         $assetUrl = route('assets.show', $asset);

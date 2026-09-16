@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssetAssignmentController;
 use App\Http\Controllers\AssetCategoryController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\DashboardController;
@@ -8,7 +9,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AssetAssignmentController;
+
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -18,6 +19,7 @@ use App\Http\Controllers\AssetAssignmentController;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -90,13 +92,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         |----------------------------------------------------------------------
         */
 
-        Route::get('/system-admin/dashboard', [DashboardController::class, 'systemAdmin'])
-            ->name('system-admin.dashboard');
+        Route::get(
+            '/system-admin/dashboard',
+            [DashboardController::class, 'systemAdmin']
+        )->name('system-admin.dashboard');
 
 
         /*
         |----------------------------------------------------------------------
-        | Staff & Users
+        | Users
         |----------------------------------------------------------------------
         */
 
@@ -132,47 +136,95 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Assignments Register
+    |--------------------------------------------------------------------------
+    |
+    | The register is available to:
+    |
+    | - Hardware Officer
+    | - Administration Officer
+    | - System Administrator
+    |
+    | The controller handles the role-based access restrictions.
+    |
+    */
+
+    Route::get(
+        '/assignments',
+        [AssetAssignmentController::class, 'index']
+    )->name('assignments.index');
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Assets
     |--------------------------------------------------------------------------
     |
-    | These routes will remain available to operational officers.
+    | AssetController separately enforces:
     |
-    | IMPORTANT:
-    | AssetController must separately enforce:
-    |
-    | Hardware Officer        → Hardware assets
-    | Administration Officer  → Administration assets
-    | System Administrator    → READ-ONLY oversight
+    | Hardware Officer       → Hardware assets
+    | Administration Officer → Administration assets
+    | System Administrator   → Read-only oversight
     |
     */
-    Route::get('/assets/tags/bulk', [AssetController::class, 'bulkTags'])
-        ->name('assets.tags.bulk');
+
+    /*
+    | Bulk asset tags MUST come before the resource route.
+    */
+
+    Route::get(
+        '/assets/tags/bulk',
+        [AssetController::class, 'bulkTags']
+    )->name('assets.tags.bulk');
+
     Route::resource('assets', AssetController::class);
-    Route::get('/assets/{asset}/tag', [AssetController::class, 'tag'])
-    ->name('assets.tag');
+
+    /*
+    | Print single asset tag
+    */
+
+    Route::get(
+        '/assets/{asset}/tag',
+        [AssetController::class, 'tag']
+    )->name('assets.tag');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Asset Assignments
+    |--------------------------------------------------------------------------
+    */
+
+    /*
+    | Assign an asset
+    */
+
+    Route::get(
+        '/assets/{asset}/assign',
+        [AssetAssignmentController::class, 'create']
+    )->name('assets.assign');
+
+    Route::post(
+        '/assets/{asset}/assign',
+        [AssetAssignmentController::class, 'store']
+    )->name('assets.assign.store');
+
+    /*
+    | Return an assigned asset
+    */
+
+    Route::post(
+        '/assets/{asset}/return',
+        [AssetAssignmentController::class, 'returnAsset']
+    )->name('assets.return');
+
 
     /*
     |--------------------------------------------------------------------------
     | Asset Categories
     |--------------------------------------------------------------------------
-    |
-    | We will later restrict category management to System Administrator.
-    |
     */
-Route::get(
-    '/assets/{asset}/assign',
-    [AssetAssignmentController::class, 'create']
-)->name('assets.assign');
 
-Route::post(
-    '/assets/{asset}/assign',
-    [AssetAssignmentController::class, 'store']
-)->name('assets.assign.store');
-
-Route::post(
-    '/assets/{asset}/return',
-    [AssetAssignmentController::class, 'returnAsset']
-)->name('assets.return');
     Route::resource(
         'asset-categories',
         AssetCategoryController::class
@@ -185,14 +237,20 @@ Route::post(
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
+    Route::get(
+        '/profile',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+    Route::patch(
+        '/profile',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+    Route::delete(
+        '/profile',
+        [ProfileController::class, 'destroy']
+    )->name('profile.destroy');
 
 });
 
