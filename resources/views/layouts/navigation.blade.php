@@ -1,4 +1,3 @@
-
 {{-- =========================================================
 CRB ASSET MANAGEMENT SYSTEM
 MAIN NAVIGATION
@@ -86,6 +85,8 @@ HARDWARE OFFICER
 
     <ul class="crb-nav">
 
+        {{-- REGISTER ASSET --}}
+
         <li>
             <a
                 href="{{ route('assets.create') }}"
@@ -96,11 +97,18 @@ HARDWARE OFFICER
             </a>
         </li>
 
+
+        {{-- MAINTENANCE --}}
+
         <li>
-           <a href="#">
-                <i class="bi bi-arrow-left-right"></i>                <span>Maintenance</span>
+            <a href="#">
+                <i class="bi bi-tools"></i>
+                <span>Maintenance</span>
             </a>
         </li>
+
+
+        {{-- ASSET MOVEMENT --}}
 
         <li>
             <a href="#">
@@ -109,16 +117,18 @@ HARDWARE OFFICER
             </a>
         </li>
 
+
+        {{-- ASSIGNMENTS --}}
+
         <li>
-    <a href="{{ route('assignments.index') }}"
-       class="{{ request()->routeIs('assignments.*') ? 'active' : '' }}">
-
-        <i class="bi bi-arrow-left-right"></i>
-
-        <span>Assignments</span>
-
-    </a>
-</li>
+            <a
+                href="{{ route('assignments.index') }}"
+                class="{{ request()->routeIs('assignments.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-person-check"></i>
+                <span>Assignments</span>
+            </a>
+        </li>
 
     </ul>
 
@@ -137,6 +147,8 @@ ADMINISTRATION OFFICER
 
     <ul class="crb-nav">
 
+        {{-- REGISTER ASSET --}}
+
         <li>
             <a
                 href="{{ route('assets.create') }}"
@@ -146,6 +158,9 @@ ADMINISTRATION OFFICER
                 <span>Register Asset</span>
             </a>
         </li>
+
+
+        {{-- ADMINISTRATION ASSETS --}}
 
         <li>
             <a
@@ -157,12 +172,18 @@ ADMINISTRATION OFFICER
             </a>
         </li>
 
+
+        {{-- VEHICLES --}}
+
         <li>
             <a href="#">
                 <i class="bi bi-car-front"></i>
                 <span>Vehicles</span>
             </a>
         </li>
+
+
+        {{-- FURNITURE --}}
 
         <li>
             <a href="#">
@@ -171,12 +192,18 @@ ADMINISTRATION OFFICER
             </a>
         </li>
 
+
+        {{-- OTHER ASSETS --}}
+
         <li>
             <a href="#">
                 <i class="bi bi-box"></i>
                 <span>Other Assets</span>
             </a>
         </li>
+
+
+        {{-- ASSET MOVEMENT --}}
 
         <li>
             <a href="#">
@@ -185,8 +212,14 @@ ADMINISTRATION OFFICER
             </a>
         </li>
 
+
+        {{-- ASSIGNMENTS --}}
+
         <li>
-            <a href="#">
+            <a
+                href="{{ route('assignments.index') }}"
+                class="{{ request()->routeIs('assignments.*') ? 'active' : '' }}"
+            >
                 <i class="bi bi-person-check"></i>
                 <span>Assignments</span>
             </a>
@@ -283,6 +316,19 @@ GOVERNANCE / MONITORING
     </div>
 
     <ul class="crb-nav">
+
+        {{-- ASSIGNMENTS REGISTER --}}
+
+        <li>
+            <a
+                href="{{ route('assignments.index') }}"
+                class="{{ request()->routeIs('assignments.*') ? 'active' : '' }}"
+            >
+                <i class="bi bi-person-check"></i>
+                <span>Assignments Register</span>
+            </a>
+        </li>
+
 
         {{-- SYSTEM ACTIVITY --}}
 
@@ -402,4 +448,3 @@ ACCOUNT
     </li>
 
 </ul>
-

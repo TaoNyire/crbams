@@ -14,7 +14,10 @@ class AssetAssignment extends Model
         'assigned_by',
         'assigned_at',
         'returned_at',
-        'returned_condition',
+        'returned_by',
+        'active_asset_id',
+        'return_condition',
+        'return_location',
         'return_notes',
         'notes',
     ];
@@ -22,7 +25,14 @@ class AssetAssignment extends Model
     protected $casts = [
         'assigned_at' => 'datetime',
         'returned_at' => 'datetime',
+        'returned_by' => 'integer',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
     public function asset(): BelongsTo
     {
@@ -43,6 +53,17 @@ class AssetAssignment extends Model
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
+
+    public function returnedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'returned_by');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Helpers
+    |--------------------------------------------------------------------------
+    */
 
     public function getIsActiveAttribute(): bool
     {

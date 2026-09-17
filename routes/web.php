@@ -213,11 +213,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | Return an assigned asset
     */
 
-    Route::post(
-        '/assets/{asset}/return',
-        [AssetAssignmentController::class, 'returnAsset']
-    )->name('assets.return');
+    Route::get('/assets/{asset}/return', [AssetAssignmentController::class, 'returnForm'])
+    ->name('assets.return.form');
 
+Route::post('/assets/{asset}/return', [AssetAssignmentController::class, 'returnAsset'])
+    ->name('assets.return');
 
     /*
     |--------------------------------------------------------------------------
