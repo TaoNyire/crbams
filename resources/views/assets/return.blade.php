@@ -1,5 +1,5 @@
-<x-app-layout>
-
+```blade
+<x-layout>
     <div class="container-fluid py-4">
 
         {{-- Page Header --}}
@@ -7,7 +7,7 @@
             <div>
                 <h2 class="fw-bold mb-1">Return Asset</h2>
                 <p class="text-muted mb-0">
-                    Record the return of an assigned asset and update its condition.
+                    Record the return of an assigned asset.
                 </p>
             </div>
 
@@ -18,302 +18,288 @@
             </a>
         </div>
 
-
-        {{-- Asset Summary --}}
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-
-                <div class="row g-4">
-
-                    <div class="col-md-3">
-                        <small class="text-muted d-block">Asset Code</small>
-                        <strong>{{ $asset->asset_code }}</strong>
-                    </div>
-
-                    <div class="col-md-3">
-                        <small class="text-muted d-block">Asset Name</small>
-                        <strong>{{ $asset->asset_name }}</strong>
-                    </div>
-
-                    <div class="col-md-3">
-                        <small class="text-muted d-block">Serial Number</small>
-                        <strong>
-                            {{ $asset->serial_number ?: 'Not specified' }}
-                        </strong>
-                    </div>
-
-                    <div class="col-md-3">
-                        <small class="text-muted d-block">Current Status</small>
-
-                        <span class="badge bg-primary">
-                            {{ $asset->status_label }}
-                        </span>
-                    </div>
-
+        {{-- Validation Errors --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <div class="fw-bold mb-2">
+                    Please correct the following errors:
                 </div>
 
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-        </div>
+        @endif
 
-
-        {{-- Current Allocation --}}
-        <div class="card border-0 shadow-sm mb-4">
-
-            <div class="card-header bg-white border-0 pt-4 px-4">
-
-                <h5 class="fw-bold mb-1">
-                    <i class="bi bi-person-check me-2"></i>
-                    Current Allocation
-                </h5>
-
-                <p class="text-muted small mb-0">
-                    Asset currently assigned to this employee.
-                </p>
-
+        {{-- Success Message --}}
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
             </div>
+        @endif
 
-            <div class="card-body px-4 pb-4">
+        <div class="row g-4">
 
-                @if($assignment && $assignment->employee)
+            {{-- Asset Information --}}
+            <div class="col-lg-5">
 
-                    <div class="row g-4">
+                <div class="card border-0 shadow-sm">
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Employee</small>
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-box-seam me-2"></i>
+                            Asset Information
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Asset Code
+                            </small>
+
+                            <strong>
+                                {{ $asset->asset_code }}
+                            </strong>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Asset Name
+                            </small>
+
+                            <strong>
+                                {{ $asset->asset_name }}
+                            </strong>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Serial Number
+                            </small>
+
+                            <strong>
+                                {{ $asset->serial_number ?: 'Not specified' }}
+                            </strong>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="fw-bold mb-3">
+                            Current Allocation
+                        </h6>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Current Holder
+                            </small>
+
                             <strong>
                                 {{ $assignment->employee->first_name }}
                                 {{ $assignment->employee->last_name }}
                             </strong>
                         </div>
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Employee Number</small>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Employee Number
+                            </small>
+
                             <strong>
                                 {{ $assignment->employee->employee_number }}
                             </strong>
                         </div>
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Department</small>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Department
+                            </small>
+
                             <strong>
-                                {{ $assignment->department?->name ?? 'Not specified' }}
+                                {{ $assignment->department->name }}
                             </strong>
                         </div>
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Assigned Date</small>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                Assigned Date
+                            </small>
+
                             <strong>
                                 {{ $assignment->assigned_at?->format('d M Y H:i') }}
                             </strong>
                         </div>
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Location</small>
-                            <strong>
-                                {{ $asset->location ?: 'Not specified' }}
-                            </strong>
-                        </div>
+                        <div>
+                            <small class="text-muted d-block">
+                                Current Condition
+                            </small>
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Assigned By</small>
                             <strong>
-                                {{ $assignment->assignedBy?->name ?? 'Not specified' }}
+                                {{ $asset->condition_label }}
                             </strong>
                         </div>
 
                     </div>
-
-                @else
-
-                    <div class="alert alert-warning mb-0">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        No active assignment was found for this asset.
-                    </div>
-
-                @endif
-
-            </div>
-        </div>
-
-
-        {{-- Return Form --}}
-        <div class="card border-0 shadow-sm">
-
-            <div class="card-header bg-white border-0 pt-4 px-4">
-
-                <h5 class="fw-bold mb-1">
-                    <i class="bi bi-box-arrow-in-left me-2"></i>
-                    Return Details
-                </h5>
-
-                <p class="text-muted small mb-0">
-                    Record the condition of the asset when it is returned.
-                </p>
+                </div>
 
             </div>
 
-            <div class="card-body px-4 pb-4">
+            {{-- Return Form --}}
+            <div class="col-lg-7">
 
-                {{-- Validation Errors --}}
-                @if($errors->any())
+                <div class="card border-0 shadow-sm">
 
-                    <div class="alert alert-danger">
-
-                        <strong>Please correct the following:</strong>
-
-                        <ul class="mb-0 mt-2">
-
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-
-                        </ul>
-
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-box-arrow-in-left me-2"></i>
+                            Return Details
+                        </h5>
                     </div>
 
-                @endif
+                    <div class="card-body">
 
+                        <form method="POST"
+                              action="{{ route('assets.return', $asset) }}">
 
-                <form method="POST"
-                      action="{{ route('assets.return', $asset) }}">
+                            @csrf
 
-                    @csrf
+                            {{-- Returned Date --}}
+                            <div class="mb-4">
 
+                                <label for="returned_at"
+                                       class="form-label fw-semibold">
 
-                    <div class="row g-4">
+                                    Returned Date
+                                    <span class="text-danger">*</span>
 
-                        {{-- Return Date --}}
-                        <div class="col-md-6">
+                                </label>
 
-                            <label for="returned_at"
-                                   class="form-label fw-semibold">
-                                Return Date
-                            </label>
+                                <input
+                                    type="date"
+                                    id="returned_at"
+                                    name="returned_at"
+                                    class="form-control @error('returned_at') is-invalid @enderror"
+                                    value="{{ old('returned_at', now()->format('Y-m-d')) }}"
+                                    max="{{ now()->format('Y-m-d') }}"
+                                    required
+                                >
 
-                            <input
-                                type="date"
-                                name="returned_at"
-                                id="returned_at"
-                                class="form-control"
-                                value="{{ old('returned_at') ?: date('Y-m-d') }}"
-                                required
-                            >
+                                @error('returned_at')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
 
-                            <div class="form-text">
-                                Date the asset was physically returned.
                             </div>
 
-                        </div>
+                            {{-- Returned Condition --}}
+                            <div class="mb-4">
 
+                                <label for="returned_condition"
+                                       class="form-label fw-semibold">
 
-                        {{-- Condition --}}
-                        <div class="col-md-6">
+                                    Returned Condition
+                                    <span class="text-danger">*</span>
 
-                            <label for="returned_condition"
-                                   class="form-label fw-semibold">
-                                Condition on Return
-                            </label>
+                                </label>
 
-                            <select
-                                name="returned_condition"
-                                id="returned_condition"
-                                class="form-select"
-                                required
-                            >
+                                <select
+                                    id="returned_condition"
+                                    name="returned_condition"
+                                    class="form-select @error('returned_condition') is-invalid @enderror"
+                                    required
+                                >
 
-                                <option value="" disabled
-                                    {{ old('returned_condition') ? '' : 'selected' }}>
-                                    Select condition
-                                </option>
+                                    <option value="">
+                                        -- Select Condition --
+                                    </option>
 
-                                <option value="good"
-                                    {{ old('returned_condition') == 'good' ? 'selected' : '' }}>
-                                    Good
-                                </option>
+                                    <option value="good"
+                                        {{ old('returned_condition') === 'good' ? 'selected' : '' }}>
+                                        Good
+                                    </option>
 
-                                <option value="damaged"
-                                    {{ old('returned_condition') == 'damaged' ? 'selected' : '' }}>
-                                    Damaged
-                                </option>
+                                    <option value="damaged"
+                                        {{ old('returned_condition') === 'damaged' ? 'selected' : '' }}>
+                                        Damaged
+                                    </option>
 
-                                <option value="needs_repair"
-                                    {{ old('returned_condition') == 'needs_repair' ? 'selected' : '' }}>
-                                    Needs Repair
-                                </option>
+                                    <option value="needs_repair"
+                                        {{ old('returned_condition') === 'needs_repair' ? 'selected' : '' }}>
+                                        Needs Repair
+                                    </option>
 
-                            </select>
+                                </select>
 
-                            <div class="form-text">
-                                If the asset needs repair, its status will automatically become Under Repair.
+                                @error('returned_condition')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
                             </div>
 
-                        </div>
+                            {{-- Return Notes --}}
+                            <div class="mb-4">
 
+                                <label for="return_notes"
+                                       class="form-label fw-semibold">
 
-                        {{-- Return Notes --}}
-                        <div class="col-12">
+                                    Return Notes
+                                </label>
 
-                            <label for="return_notes"
-                                   class="form-label fw-semibold">
-                                Return Notes
-                            </label>
+                                <textarea
+                                    id="return_notes"
+                                    name="return_notes"
+                                    rows="4"
+                                    class="form-control @error('return_notes') is-invalid @enderror"
+                                    placeholder="Enter any relevant information about the returned asset..."
+                                >{{ old('return_notes') }}</textarea>
 
-                            <textarea
-                                name="return_notes"
-                                id="return_notes"
-                                rows="4"
-                                class="form-control"
-                                placeholder="Describe the condition of the asset, any damage, missing accessories, or other relevant information..."
-                            >{{ old('return_notes') }}</textarea>
+                                @error('return_notes')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
 
-                            <div class="form-text">
-                                Optional. These notes will remain part of the assignment history.
                             </div>
 
-                        </div>
+                            <hr class="my-4">
+
+                            {{-- Buttons --}}
+                            <div class="d-flex justify-content-end gap-2">
+
+                                <a href="{{ route('assets.show', $asset) }}"
+                                   class="btn btn-outline-secondary">
+
+                                    Cancel
+
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-warning">
+
+                                    <i class="bi bi-box-arrow-in-left me-1"></i>
+
+                                    Complete Return
+
+                                </button>
+
+                            </div>
+
+                        </form>
 
                     </div>
-
-
-                    {{-- Warning --}}
-                    <div class="alert alert-warning mt-4">
-
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-
-                        <strong>Important:</strong>
-
-                        Returning this asset will end its current assignment.
-                        The assignment will remain permanently recorded in the asset history.
-
-                    </div>
-
-
-                    {{-- Actions --}}
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-
-                        <a href="{{ route('assets.show', $asset) }}"
-                           class="btn btn-outline-secondary">
-                            Cancel
-                        </a>
-
-                        <button type="submit"
-                                class="btn btn-primary"
-                                onclick="return confirm('Are you sure you want to return this asset?');">
-
-                            <i class="bi bi-box-arrow-in-left me-1"></i>
-
-                            Confirm Return
-
-                        </button>
-
-                    </div>
-
-                </form>
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-</x-app-layout>
+</x-layout>
+```

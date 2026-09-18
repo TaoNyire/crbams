@@ -1,603 +1,233 @@
+```blade
 <x-app-layout>
 
-    <x-slot name="title">
-        Asset Allocation Register
-    </x-slot>
+    <div class="container-fluid py-4">
 
-    <style>
-        .allocation-page {
-            padding-bottom: 40px;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .page-title {
-            margin: 0;
-            font-weight: 700;
-            color: #246d69;
-        }
-
-        .page-subtitle {
-            margin: 5px 0 0;
-            color: #6c757d;
-        }
-
-        .stat-card {
-            border: 0;
-            border-radius: 14px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
-            height: 100%;
-        }
-
-        .stat-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #eef7f6;
-            color: #246d69;
-            font-size: 1.15rem;
-        }
-
-        .stat-label {
-            color: #6c757d;
-            font-size: .78rem;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-            margin-top: 12px;
-        }
-
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #246d69;
-            margin-top: 3px;
-        }
-
-        .filter-card,
-        .table-card {
-            border: 0;
-            border-radius: 14px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
-        }
-
-        .filter-card .card-body {
-            padding: 22px;
-        }
-
-        .table-card {
-            overflow: hidden;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .allocation-table {
-            min-width: 1250px;
-        }
-
-        .allocation-table thead th {
-            background: #246d69;
-            color: white;
-            font-size: .79rem;
-            font-weight: 600;
-            white-space: nowrap;
-            vertical-align: middle;
-            padding: 14px 12px;
-            border: 0;
-        }
-
-        .allocation-table tbody td {
-            vertical-align: middle;
-            font-size: .88rem;
-            padding: 14px 12px;
-            border-color: #edf0f0;
-        }
-
-        .allocation-table tbody tr:hover {
-            background: #f8fbfb;
-        }
-
-        .asset-code {
-            font-weight: 700;
-            color: #246d69;
-            font-size: .9rem;
-        }
-
-        .asset-name {
-            max-width: 220px;
-            white-space: normal;
-            line-height: 1.35;
-        }
-
-        .category-name {
-            font-weight: 600;
-        }
-
-        .management-area {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            background: #f1f8f7;
-            color: #246d69;
-            font-size: .75rem;
-            font-weight: 600;
-        }
-
-        .department-name {
-            font-weight: 600;
-        }
-
-        .department-code {
-            color: #6c757d;
-            font-size: .75rem;
-            margin-top: 2px;
-        }
-
-        .employee-name {
-            font-weight: 600;
-        }
-
-        .employee-number {
-            color: #6c757d;
-            font-size: .75rem;
-            margin-top: 2px;
-        }
-
-        .unassigned-text {
-            color: #6c757d;
-            font-style: italic;
-        }
-
-        .assigned-by {
-            font-weight: 500;
-        }
-
-        .date-value {
-            white-space: nowrap;
-            font-weight: 500;
-        }
-
-        .date-time {
-            color: #6c757d;
-            font-size: .75rem;
-            margin-top: 2px;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 10px;
-            border-radius: 50px;
-            font-size: .75rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .status-assigned {
-            background: #c9ff83;
-            color: #1d4d49;
-        }
-
-        .status-available {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .status-repair {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-lost {
-            background: #f8d7da;
-            color: #842029;
-        }
-
-        .status-disposed {
-            background: #e9ecef;
-            color: #495057;
-        }
-
-        .status-retired {
-            background: #dee2e6;
-            color: #343a40;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .action-buttons .btn {
-            min-width: 38px;
-        }
-
-        .return-button {
-            border-color: #dc3545;
-            color: #dc3545;
-        }
-
-        .return-button:hover {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-crb {
-            background: #246d69;
-            border-color: #246d69;
-            color: white;
-        }
-
-        .btn-crb:hover {
-            background: #1c5956;
-            border-color: #1c5956;
-            color: white;
-        }
-
-        .oversight-note {
-            background: #f1f8f7;
-            border-left: 4px solid #246d69;
-            color: #495057;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-        }
-
-        .oversight-note i {
-            color: #246d69;
-        }
-
-        .filter-label {
-            margin-bottom: 7px;
-            font-size: .85rem;
-        }
-
-        .empty-state {
-            padding: 70px 20px;
-            text-align: center;
-            color: #6c757d;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #246d69;
-            margin-bottom: 15px;
-        }
-
-        .register-info {
-            padding: 15px 18px;
-            background: #fafcfc;
-            border-bottom: 1px solid #edf0f0;
-        }
-
-        .register-info-title {
-            font-weight: 700;
-            color: #246d69;
-        }
-
-        .register-info-text {
-            color: #6c757d;
-            font-size: .82rem;
-            margin-top: 2px;
-        }
-
-        @media (max-width: 768px) {
-
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .page-header .btn {
-                width: 100%;
-            }
-
-            .stat-card {
-                margin-bottom: 5px;
-            }
-        }
-
-        @media print {
-
-            .crb-sidebar,
-            .page-header .btn,
-            .filter-card,
-            .action-buttons,
-            .oversight-note,
-            .pagination {
-                display: none !important;
-            }
-
-            .allocation-page {
-                padding: 0;
-            }
-
-            .table-card,
-            .stat-card {
-                box-shadow: none !important;
-            }
-
-            .allocation-table {
-                min-width: 0;
-            }
-        }
-    </style>
-
-
-    <div class="container-fluid allocation-page">
-
-        {{-- =====================================================
-             PAGE HEADER
-        ====================================================== --}}
-
-        <div class="page-header">
-
+        {{-- Page Header --}}
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="page-title">
-                    <i class="bi bi-arrow-left-right me-2"></i>
-                    Asset Allocation Register
-                </h2>
-
-                <p class="page-subtitle">
+                <h2 class="fw-bold mb-1">Asset Allocation Register</h2>
+                <p class="text-muted mb-0">
                     Monitor current asset allocation, availability and operational status.
                 </p>
             </div>
-
-            <a href="{{ route('assets.index') }}"
-               class="btn btn-crb">
-
-                <i class="bi bi-box-seam me-1"></i>
-                View Asset Register
-
-            </a>
-
         </div>
 
-
-        {{-- =====================================================
-             ROLE INFORMATION
-        ====================================================== --}}
-
-        @if(auth()->user()->role === 'system_admin')
-
-            <div class="oversight-note">
-
-                <i class="bi bi-shield-check me-2"></i>
-
-                <strong>Oversight Mode:</strong>
-
-                You are viewing the consolidated asset allocation register
-                for monitoring and audit purposes. System Administrators
-                cannot assign, return or modify assets.
-
-            </div>
-
-        @else
-
-            <div class="oversight-note">
-
-                <i class="bi bi-info-circle me-2"></i>
-
-                <strong>Asset Operations:</strong>
-
-                This register shows assets within your management area,
-                including assigned, available and under-repair assets.
-
-            </div>
-
-        @endif
-
-
-        {{-- =====================================================
-             FLASH MESSAGES
-        ====================================================== --}}
-
-        @if(session('success'))
-
-            <div class="alert alert-success alert-dismissible fade show"
-                 role="alert">
-
+        {{-- Success Message --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="bi bi-check-circle me-2"></i>
-
                 {{ session('success') }}
 
                 <button type="button"
                         class="btn-close"
-                        data-bs-dismiss="alert">
+                        data-bs-dismiss="alert"
+                        aria-label="Close">
                 </button>
-
             </div>
-
         @endif
 
-
-        @if(session('error'))
-
-            <div class="alert alert-danger alert-dismissible fade show"
-                 role="alert">
-
-                <i class="bi bi-exclamation-circle me-2"></i>
-
+        {{-- Error Message --}}
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
                 {{ session('error') }}
 
                 <button type="button"
                         class="btn-close"
-                        data-bs-dismiss="alert">
+                        data-bs-dismiss="alert"
+                        aria-label="Close">
                 </button>
-
             </div>
-
         @endif
 
+        {{-- Validation Errors --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <div class="fw-bold mb-2">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Please correct the following errors:
+                </div>
 
-        {{-- =====================================================
-             STATISTICS
-        ====================================================== --}}
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
+        {{-- Register Information --}}
+        <div class="alert alert-info border-0 shadow-sm mb-4">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle fs-5 me-2"></i>
+
+                <div>
+                    <strong>Asset Operations:</strong>
+                    This register shows assets within your permitted management
+                    area, including assigned, available and under-repair assets.
+                </div>
+            </div>
+        </div>
+
+        {{-- Statistics --}}
         <div class="row g-4 mb-4">
 
-            {{-- TOTAL ASSETS --}}
-
-            <div class="col-xl col-md-6">
-
-                <div class="card stat-card">
-
+            {{-- Total --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
 
-                        <div class="stat-icon">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
+                        <div class="d-flex justify-content-between align-items-start">
 
-                        <div class="stat-label">
-                            Total Assets
-                        </div>
+                            <div>
+                                <div class="text-muted small mb-1">
+                                    Total Assets
+                                </div>
 
-                        <div class="stat-number">
-                            {{ number_format($totalAssets) }}
-                        </div>
+                                <h3 class="fw-bold mb-1">
+                                    {{ $totalAssets }}
+                                </h3>
 
-                        <div class="text-muted small">
-                            Assets in this register
+                                <div class="small text-muted">
+                                    Assets in this register
+                                </div>
+                            </div>
+
+                            <div class="fs-3 text-primary">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
 
-
-            {{-- ASSIGNED --}}
-
-            <div class="col-xl col-md-6">
-
-                <div class="card stat-card">
-
+            {{-- Assigned --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
 
-                        <div class="stat-icon">
-                            <i class="bi bi-person-check"></i>
-                        </div>
+                        <div class="d-flex justify-content-between align-items-start">
 
-                        <div class="stat-label">
-                            Assigned
-                        </div>
+                            <div>
+                                <div class="text-muted small mb-1">
+                                    Assigned
+                                </div>
 
-                        <div class="stat-number">
-                            {{ number_format($assignedAssets) }}
-                        </div>
+                                <h3 class="fw-bold mb-1">
+                                    {{ $assignedAssets }}
+                                </h3>
 
-                        <div class="text-muted small">
-                            Currently allocated
+                                <div class="small text-muted">
+                                    Currently allocated
+                                </div>
+                            </div>
+
+                            <div class="fs-3 text-success">
+                                <i class="bi bi-person-check"></i>
+                            </div>
+
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
 
-
-            {{-- AVAILABLE --}}
-
-            <div class="col-xl col-md-6">
-
-                <div class="card stat-card">
-
+            {{-- Available --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
 
-                        <div class="stat-icon">
-                            <i class="bi bi-box-arrow-in-down"></i>
-                        </div>
+                        <div class="d-flex justify-content-between align-items-start">
 
-                        <div class="stat-label">
-                            Available / Idle
-                        </div>
+                            <div>
+                                <div class="text-muted small mb-1">
+                                    Available / Idle
+                                </div>
 
-                        <div class="stat-number">
-                            {{ number_format($availableAssets) }}
-                        </div>
+                                <h3 class="fw-bold mb-1">
+                                    {{ $availableAssets }}
+                                </h3>
 
-                        <div class="text-muted small">
-                            Ready for allocation
+                                <div class="small text-muted">
+                                    Ready for allocation
+                                </div>
+                            </div>
+
+                            <div class="fs-3 text-info">
+                                <i class="bi bi-box-arrow-in-down"></i>
+                            </div>
+
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
 
-
-            {{-- UNDER REPAIR --}}
-
-            <div class="col-xl col-md-6">
-
-                <div class="card stat-card">
-
+            {{-- Under Repair --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
 
-                        <div class="stat-icon">
-                            <i class="bi bi-tools"></i>
-                        </div>
+                        <div class="d-flex justify-content-between align-items-start">
 
-                        <div class="stat-label">
-                            Under Repair
-                        </div>
+                            <div>
+                                <div class="text-muted small mb-1">
+                                    Under Repair
+                                </div>
 
-                        <div class="stat-number">
-                            {{ number_format($underRepairAssets) }}
-                        </div>
+                                <h3 class="fw-bold mb-1">
+                                    {{ $underRepairAssets }}
+                                </h3>
 
-                        <div class="text-muted small">
-                            Currently unavailable
+                                <div class="small text-muted">
+                                    Currently unavailable
+                                </div>
+                            </div>
+
+                            <div class="fs-3 text-warning">
+                                <i class="bi bi-tools"></i>
+                            </div>
+
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
 
+        </div>
 
-            {{-- RETIRED --}}
+        {{-- Retired --}}
+        <div class="row g-4 mb-4">
 
-            <div class="col-xl col-md-6">
+            <div class="col-xl-3 col-md-6">
 
-                <div class="card stat-card">
+                <div class="card border-0 shadow-sm h-100">
 
                     <div class="card-body">
 
-                        <div class="stat-icon">
-                            <i class="bi bi-archive"></i>
-                        </div>
+                        <div class="d-flex justify-content-between align-items-start">
 
-                        <div class="stat-label">
-                            Retired
-                        </div>
+                            <div>
+                                <div class="text-muted small mb-1">
+                                    Retired
+                                </div>
 
-                        <div class="stat-number">
-                            {{ number_format($retiredAssets) }}
-                        </div>
+                                <h3 class="fw-bold mb-1">
+                                    {{ $retiredAssets }}
+                                </h3>
 
-                        <div class="text-muted small">
-                            Removed from active use
+                                <div class="small text-muted">
+                                    Removed from active use
+                                </div>
+                            </div>
+
+                            <div class="fs-3 text-secondary">
+                                <i class="bi bi-archive"></i>
+                            </div>
+
                         </div>
 
                     </div>
@@ -608,62 +238,69 @@
 
         </div>
 
+        {{-- Filters --}}
+        <div class="card border-0 shadow-sm mb-4">
 
-        {{-- =====================================================
-             FILTERS
-        ====================================================== --}}
+            <div class="card-header bg-white py-3">
 
-        <div class="card filter-card mb-4">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-funnel me-2"></i>
+                    Search & Filter Assets
+                </h5>
+
+            </div>
 
             <div class="card-body">
 
                 <form method="GET"
                       action="{{ route('assignments.index') }}">
 
-                    <div class="row g-3 align-items-end">
+                    <div class="row g-3">
 
+                        {{-- Search --}}
+                        <div class="col-lg-4">
 
-                        {{-- SEARCH --}}
-
-                        <div class="col-xl-4 col-lg-5">
-
-                            <label class="form-label fw-semibold filter-label">
+                            <label for="search"
+                                   class="form-label fw-semibold">
                                 Search Assets
                             </label>
 
                             <input
                                 type="text"
+                                id="search"
                                 name="search"
-                                class="form-control"
                                 value="{{ request('search') }}"
-                                placeholder="Asset code, name, serial number, employee..."
+                                class="form-control"
+                                placeholder="Asset code, name, serial, employee..."
                             >
 
                         </div>
 
+                        {{-- Management Area --}}
+                        @if (auth()->user()->role === 'system_admin')
 
-                        {{-- MANAGEMENT AREA --}}
+                            <div class="col-lg-3">
 
-                        <div class="col-xl-2 col-lg-3">
+                                <label for="management_area"
+                                       class="form-label fw-semibold">
+                                    Management Area
+                                </label>
 
-                            <label class="form-label fw-semibold filter-label">
-                                Management Area
-                            </label>
-
-                            @if(auth()->user()->role === 'system_admin')
-
-                                <select name="management_area"
-                                        class="form-select">
+                                <select
+                                    id="management_area"
+                                    name="management_area"
+                                    class="form-select"
+                                >
 
                                     <option value="">
-                                        All Areas
+                                        All Management Areas
                                     </option>
 
-                                    @foreach($managementAreas as $value => $label)
+                                    @foreach ($managementAreas as $key => $label)
 
                                         <option
-                                            value="{{ $value }}"
-                                            @selected(request('management_area') === $value)
+                                            value="{{ $key }}"
+                                            {{ request('management_area') === $key ? 'selected' : '' }}
                                         >
                                             {{ $label }}
                                         </option>
@@ -672,47 +309,50 @@
 
                                 </select>
 
-                            @else
+                            </div>
 
-                                <select class="form-select" disabled>
+                        @else
 
-                                    <option>
-                                        {{ $managementAreas[auth()->user()->management_area] ?? ucfirst(auth()->user()->management_area) }}
-                                    </option>
+                            <div class="col-lg-3">
 
-                                </select>
+                                <label class="form-label fw-semibold">
+                                    Management Area
+                                </label>
 
                                 <input
-                                    type="hidden"
-                                    name="management_area"
-                                    value="{{ auth()->user()->management_area }}"
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ ucfirst(auth()->user()->management_area) }}"
+                                    readonly
                                 >
 
-                            @endif
+                            </div>
 
-                        </div>
+                        @endif
 
+                        {{-- Department --}}
+                        <div class="col-lg-3">
 
-                        {{-- DEPARTMENT --}}
-
-                        <div class="col-xl-2 col-lg-3">
-
-                            <label class="form-label fw-semibold filter-label">
+                            <label for="department_id"
+                                   class="form-label fw-semibold">
                                 Department
                             </label>
 
-                            <select name="department_id"
-                                    class="form-select">
+                            <select
+                                id="department_id"
+                                name="department_id"
+                                class="form-select"
+                            >
 
                                 <option value="">
                                     All Departments
                                 </option>
 
-                                @foreach($departments as $department)
+                                @foreach ($departments as $department)
 
                                     <option
                                         value="{{ $department->id }}"
-                                        @selected((string) request('department_id') === (string) $department->id)
+                                        {{ (string) request('department_id') === (string) $department->id ? 'selected' : '' }}
                                     >
                                         {{ $department->name }}
                                     </option>
@@ -723,61 +363,51 @@
 
                         </div>
 
+                        {{-- Status --}}
+                        <div class="col-lg-2">
 
-                        {{-- STATUS --}}
-
-                        <div class="col-xl-2 col-lg-3">
-
-                            <label class="form-label fw-semibold filter-label">
+                            <label for="status"
+                                   class="form-label fw-semibold">
                                 Asset Status
                             </label>
 
-                            <select name="status"
-                                    class="form-select">
+                            <select
+                                id="status"
+                                name="status"
+                                class="form-select"
+                            >
 
                                 <option value="">
                                     All Statuses
                                 </option>
 
-                                <option
-                                    value="assigned"
-                                    @selected(request('status') === 'assigned')
-                                >
+                                <option value="assigned"
+                                    {{ request('status') === 'assigned' ? 'selected' : '' }}>
                                     Assigned
                                 </option>
 
-                                <option
-                                    value="available"
-                                    @selected(request('status') === 'available')
-                                >
+                                <option value="available"
+                                    {{ request('status') === 'available' ? 'selected' : '' }}>
                                     Available / Idle
                                 </option>
 
-                                <option
-                                    value="under_repair"
-                                    @selected(request('status') === 'under_repair')
-                                >
+                                <option value="under_repair"
+                                    {{ request('status') === 'under_repair' ? 'selected' : '' }}>
                                     Under Repair
                                 </option>
 
-                                <option
-                                    value="lost"
-                                    @selected(request('status') === 'lost')
-                                >
+                                <option value="lost"
+                                    {{ request('status') === 'lost' ? 'selected' : '' }}>
                                     Lost
                                 </option>
 
-                                <option
-                                    value="disposed"
-                                    @selected(request('status') === 'disposed')
-                                >
+                                <option value="disposed"
+                                    {{ request('status') === 'disposed' ? 'selected' : '' }}>
                                     Disposed
                                 </option>
 
-                                <option
-                                    value="retired"
-                                    @selected(request('status') === 'retired')
-                                >
+                                <option value="retired"
+                                    {{ request('status') === 'retired' ? 'selected' : '' }}>
                                     Retired
                                 </option>
 
@@ -785,26 +415,28 @@
 
                         </div>
 
+                        {{-- Buttons --}}
+                        <div class="col-12">
 
-                        {{-- BUTTONS --}}
+                            <div class="d-flex gap-2">
 
-                        <div class="col-xl-2 col-lg-3 d-flex gap-2">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                >
+                                    <i class="bi bi-search me-1"></i>
+                                    Apply Filters
+                                </button>
 
-                            <button type="submit"
-                                    class="btn btn-crb flex-fill">
+                                <a
+                                    href="{{ route('assignments.index') }}"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Clear
+                                </a>
 
-                                <i class="bi bi-funnel me-1"></i>
-                                Filter
-
-                            </button>
-
-                            <a href="{{ route('assignments.index') }}"
-                               class="btn btn-outline-secondary"
-                               title="Clear filters">
-
-                                <i class="bi bi-x-lg"></i>
-
-                            </a>
+                            </div>
 
                         </div>
 
@@ -816,245 +448,116 @@
 
         </div>
 
+        {{-- Allocation Register --}}
+        <div class="card border-0 shadow-sm">
 
-        {{-- =====================================================
-             REGISTER TABLE
-        ====================================================== --}}
+            <div class="card-header bg-white py-3">
 
-        <div class="card table-card">
+                <div class="d-flex justify-content-between align-items-center">
 
-            {{-- REGISTER HEADER --}}
+                    <div>
 
-            <div class="register-info">
+                        <h5 class="mb-1 fw-bold">
+                            Current Asset Allocation
+                        </h5>
 
-                <div class="register-info-title">
+                        <small class="text-muted">
+                            Current allocation and operational status of assets.
+                        </small>
 
-                    <i class="bi bi-list-check me-1"></i>
-
-                    Current Asset Allocation
-
-                </div>
-
-                <div class="register-info-text">
-
-                    Every asset within your permitted management area is
-                    displayed. Assignment status reflects the asset's
-                    current operational state.
+                    </div>
 
                 </div>
 
             </div>
 
-
             <div class="card-body p-0">
 
-                @if($assets->count())
+                @if ($assets->count())
 
                     <div class="table-responsive">
 
-                        <table class="table table-hover mb-0 allocation-table">
+                        <table class="table table-hover align-middle mb-0">
 
-                            <thead>
+                            <thead class="table-light">
 
                                 <tr>
 
-                                    <th>
-                                        Asset
-                                    </th>
-
-                                    <th>
-                                        Category
-                                    </th>
-
-                                    <th>
-                                        Management Area
-                                    </th>
-
-                                    <th>
-                                        Department
-                                    </th>
-
-                                    <th>
-                                        Current Holder
-                                    </th>
-
-                                    <th>
-                                        Assignment
-                                    </th>
-
-                                    <th>
-                                        Status
-                                    </th>
-
-                                    <th class="text-end">
-                                        Action
-                                    </th>
+                                    <th>Asset</th>
+                                    <th>Category</th>
+                                    <th>Management Area</th>
+                                    <th>Department</th>
+                                    <th>Current Holder</th>
+                                    <th>Assignment</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
 
                                 </tr>
 
                             </thead>
 
-
                             <tbody>
 
-                                @foreach($assets as $asset)
+                                @foreach ($assets as $asset)
 
                                     @php
-
-                                        /*
-                                         * Asset status is the source of truth.
-                                         *
-                                         * An active assignment is only treated
-                                         * as the current allocation when the
-                                         * asset itself is marked "assigned".
-                                         */
-
-                                        $currentAssignment = null;
-
-                                        if ($asset->status === 'assigned') {
-                                            $currentAssignment = $asset->assignments->first();
-                                        }
-
-                                        $statusLabel = match($asset->status) {
-                                            'assigned' => 'Assigned',
-                                            'available' => 'Available / Idle',
-                                            'under_repair' => 'Under Repair',
-                                            'lost' => 'Lost',
-                                            'disposed' => 'Disposed',
-                                            'retired' => 'Retired',
-                                            default => ucfirst(str_replace('_', ' ', $asset->status)),
-                                        };
-
-                                        $statusClass = match($asset->status) {
-                                            'assigned' => 'status-assigned',
-                                            'available' => 'status-available',
-                                            'under_repair' => 'status-repair',
-                                            'lost' => 'status-lost',
-                                            'disposed' => 'status-disposed',
-                                            'retired' => 'status-retired',
-                                            default => 'status-disposed',
-                                        };
-
-                                        $statusIcon = match($asset->status) {
-                                            'assigned' => 'bi-person-check',
-                                            'available' => 'bi-check-circle',
-                                            'under_repair' => 'bi-tools',
-                                            'lost' => 'bi-question-circle',
-                                            'disposed' => 'bi-trash',
-                                            'retired' => 'bi-archive',
-                                            default => 'bi-info-circle',
-                                        };
-
+                                        $activeAssignment = $asset->activeAssignment;
                                     @endphp
-
 
                                     <tr>
 
-                                        {{-- ==========================================
-                                             ASSET
-                                        =========================================== --}}
-
+                                        {{-- Asset --}}
                                         <td>
 
                                             <a
                                                 href="{{ route('assets.show', $asset) }}"
-                                                class="text-decoration-none"
+                                                class="text-decoration-none fw-bold"
                                             >
-
-                                                <div class="asset-code">
-                                                    {{ $asset->asset_code }}
-                                                </div>
-
-                                                <div class="text-muted small asset-name">
-                                                    {{ $asset->asset_name }}
-                                                </div>
-
-                                                @if($asset->serial_number)
-
-                                                    <div class="text-muted"
-                                                         style="font-size:.72rem; margin-top:3px;">
-
-                                                        S/N:
-                                                        {{ $asset->serial_number }}
-
-                                                    </div>
-
-                                                @endif
-
+                                                {{ $asset->asset_code }}
                                             </a>
 
-                                        </td>
+                                            <div class="small text-muted">
+                                                {{ $asset->asset_name }}
+                                            </div>
 
+                                            @if ($asset->serial_number)
 
-                                        {{-- ==========================================
-                                             CATEGORY
-                                        =========================================== --}}
-
-                                        <td>
-
-                                            @if($asset->category)
-
-                                                <div class="category-name">
-                                                    {{ $asset->category->name }}
+                                                <div class="small text-muted">
+                                                    S/N: {{ $asset->serial_number }}
                                                 </div>
-
-                                            @else
-
-                                                <span class="text-muted">
-                                                    —
-                                                </span>
 
                                             @endif
 
                                         </td>
 
+                                        {{-- Category --}}
+                                        <td>
+                                            {{ $asset->category?->name ?? '—' }}
+                                        </td>
 
-                                        {{-- ==========================================
-                                             MANAGEMENT AREA
-                                        =========================================== --}}
-
+                                        {{-- Management Area --}}
                                         <td>
 
-                                            @php
-                                                $area = $asset->category?->responsible_officer;
-                                            @endphp
+                                            <span class="badge bg-light text-dark">
 
-                                            @if($area)
+                                                {{ ucfirst(
+                                                    $asset->category?->responsible_officer ?? '—'
+                                                ) }}
 
-                                                <span class="management-area">
-
-                                                    <i class="bi bi-shield-check"></i>
-
-                                                    {{ $managementAreas[$area] ?? ucfirst($area) }}
-
-                                                </span>
-
-                                            @else
-
-                                                <span class="text-muted">
-                                                    —
-                                                </span>
-
-                                            @endif
+                                            </span>
 
                                         </td>
 
-
-                                        {{-- ==========================================
-                                             DEPARTMENT
-                                        =========================================== --}}
-
+                                        {{-- Department --}}
                                         <td>
 
-                                            @if($asset->department)
+                                            @if ($asset->department)
 
-                                                <div class="department-name">
-                                                    {{ $asset->department->name }}
-                                                </div>
+                                                {{ $asset->department->name }}
 
-                                                @if($asset->department->code)
+                                                @if ($asset->department->code)
 
-                                                    <div class="department-code">
+                                                    <div class="small text-muted">
                                                         {{ $asset->department->code }}
                                                     </div>
 
@@ -1062,7 +565,7 @@
 
                                             @else
 
-                                                <span class="unassigned-text">
+                                                <span class="text-muted fst-italic">
                                                     Unassigned
                                                 </span>
 
@@ -1070,88 +573,47 @@
 
                                         </td>
 
-
-                                        {{-- ==========================================
-                                             CURRENT HOLDER
-                                        =========================================== --}}
-
+                                        {{-- Current Holder --}}
                                         <td>
 
-                                            @if($asset->status === 'assigned' && $asset->employee)
+                                            @if ($activeAssignment?->employee)
 
-                                                <div class="employee-name">
+                                                <strong>
+                                                    {{ $activeAssignment->employee->first_name }}
+                                                    {{ $activeAssignment->employee->last_name }}
+                                                </strong>
 
-                                                    {{ $asset->employee->first_name }}
-                                                    {{ $asset->employee->last_name }}
-
+                                                <div class="small text-muted">
+                                                    {{ $activeAssignment->employee->employee_number }}
                                                 </div>
-
-                                                @if($asset->employee->employee_number)
-
-                                                    <div class="employee-number">
-
-                                                        {{ $asset->employee->employee_number }}
-
-                                                    </div>
-
-                                                @endif
 
                                             @else
 
-                                                <span class="unassigned-text">
-
-                                                    <i class="bi bi-person-dash me-1"></i>
-
+                                                <span class="text-muted fst-italic">
                                                     No current holder
-
                                                 </span>
 
                                             @endif
 
                                         </td>
 
-
-                                        {{-- ==========================================
-                                             ASSIGNMENT INFORMATION
-                                        =========================================== --}}
-
+                                        {{-- Assignment Information --}}
                                         <td>
 
-                                            @if($currentAssignment)
+                                            @if ($activeAssignment)
 
-                                                <div class="assigned-by">
-
-                                                    @if($currentAssignment->assignedBy)
-
-                                                        {{ $currentAssignment->assignedBy->name }}
-
-                                                    @else
-
-                                                        <span class="text-muted">
-                                                            Unknown
-                                                        </span>
-
-                                                    @endif
-
+                                                <div class="fw-semibold">
+                                                    {{ $activeAssignment->assignedBy?->name ?? '—' }}
                                                 </div>
 
-                                                @if($currentAssignment->assigned_at)
-
-                                                    <div class="date-time">
-
-                                                        {{ $currentAssignment->assigned_at->format('d M Y') }}
-
-                                                        ·
-
-                                                        {{ $currentAssignment->assigned_at->format('H:i') }}
-
-                                                    </div>
-
-                                                @endif
+                                                <div class="small text-muted">
+                                                    Assigned:
+                                                    {{ $activeAssignment->assigned_at?->format('d M Y · H:i') ?? '—' }}
+                                                </div>
 
                                             @else
 
-                                                <span class="unassigned-text">
+                                                <span class="text-muted fst-italic">
                                                     No active assignment
                                                 </span>
 
@@ -1159,84 +621,100 @@
 
                                         </td>
 
-
-                                        {{-- ==========================================
-                                             STATUS
-                                        =========================================== --}}
-
+                                        {{-- Status --}}
                                         <td>
 
-                                            <span class="status-badge {{ $statusClass }}">
+                                            @switch($asset->status)
 
-                                                <i class="bi {{ $statusIcon }}"></i>
+                                                @case('assigned')
 
-                                                {{ $statusLabel }}
+                                                    <span class="badge bg-success">
+                                                        Assigned
+                                                    </span>
 
-                                            </span>
+                                                    @break
+
+                                                @case('available')
+
+                                                    <span class="badge bg-info text-dark">
+                                                        Available / Idle
+                                                    </span>
+
+                                                    @break
+
+                                                @case('under_repair')
+
+                                                    <span class="badge bg-warning text-dark">
+                                                        Under Repair
+                                                    </span>
+
+                                                    @break
+
+                                                @case('lost')
+
+                                                    <span class="badge bg-danger">
+                                                        Lost
+                                                    </span>
+
+                                                    @break
+
+                                                @case('disposed')
+
+                                                    <span class="badge bg-secondary">
+                                                        Disposed
+                                                    </span>
+
+                                                    @break
+
+                                                @case('retired')
+
+                                                    <span class="badge bg-dark">
+                                                        Retired
+                                                    </span>
+
+                                                    @break
+
+                                                @default
+
+                                                    <span class="badge bg-secondary">
+                                                        {{ $asset->status_label }}
+                                                    </span>
+
+                                            @endswitch
 
                                         </td>
 
-
-                                        {{-- ==========================================
-                                             ACTIONS
-                                        =========================================== --}}
-
+                                        {{-- Action --}}
                                         <td class="text-end">
 
-                                            <div class="action-buttons">
+                                            @if ($asset->status === 'assigned')
 
-                                                {{-- VIEW ASSET --}}
+                                                @if (auth()->user()->role !== 'system_admin')
 
-                                                <a
-                                                    href="{{ route('assets.show', $asset) }}"
-                                                    class="btn btn-sm btn-outline-secondary"
-                                                    title="View Asset"
-                                                >
-
-                                                    <i class="bi bi-eye"></i>
-
-                                                </a>
-
-
-                                                {{-- RETURN ASSET --}}
-                                                {{-- ONLY OPERATIONAL OFFICERS --}}
-                                                {{-- ONLY CURRENTLY ASSIGNED ASSETS --}}
-
-                                                @if(
-                                                    $asset->status === 'assigned'
-                                                    &&
-                                                    in_array(auth()->user()->role, [
-                                                        'hardware_officer',
-                                                        'administration_officer'
-                                                    ])
-                                                )
-
-                                                    <form
-                                                        method="POST"
-                                                        action="{{ route('assets.return', $asset) }}"
-                                                        onsubmit="return confirm('Return this asset and close the current assignment?');"
-                                                        class="d-inline"
+                                                    <a
+                                                        href="{{ route('assets.return.form', $asset) }}"
+                                                        class="btn btn-warning btn-sm"
+                                                        title="Return Asset"
                                                     >
+                                                        <i class="bi bi-box-arrow-in-left me-1"></i>
+                                                        Return
+                                                    </a>
 
-                                                        @csrf
+                                                @else
 
-                                                        <button
-                                                            type="submit"
-                                                            class="btn btn-sm return-button"
-                                                            title="Return Asset"
-                                                        >
-
-                                                            <i class="bi bi-arrow-return-left me-1"></i>
-
-                                                            Return
-
-                                                        </button>
-
-                                                    </form>
+                                                    <span class="text-muted small">
+                                                        View Only
+                                                    </span>
 
                                                 @endif
 
-                                            </div>
+                                            @else
+
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+
+                                            @endif
 
                                         </td>
 
@@ -1252,21 +730,18 @@
 
                 @else
 
-                    {{-- =================================================
-                         EMPTY STATE
-                    ================================================== --}}
+                    <div class="text-center py-5">
 
-                    <div class="empty-state">
+                        <div class="fs-1 text-muted mb-3">
+                            <i class="bi bi-inboxes"></i>
+                        </div>
 
-                        <i class="bi bi-search"></i>
-
-                        <h5>
-                            No assets found
+                        <h5 class="fw-bold">
+                            No Assets Found
                         </h5>
 
-                        <p class="mb-0">
-                            No assets match the current search and filter
-                            criteria.
+                        <p class="text-muted mb-0">
+                            No assets match the current search and filter criteria.
                         </p>
 
                     </div>
@@ -1275,14 +750,10 @@
 
             </div>
 
+            {{-- Pagination --}}
+            @if ($assets->hasPages())
 
-            {{-- =====================================================
-                 PAGINATION
-            ====================================================== --}}
-
-            @if($assets->hasPages())
-
-                <div class="card-footer bg-white border-0">
+                <div class="card-footer bg-white">
 
                     {{ $assets->links() }}
 
@@ -1295,3 +766,4 @@
     </div>
 
 </x-app-layout>
+```
