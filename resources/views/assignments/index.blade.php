@@ -1,4 +1,3 @@
-```blade
 <x-app-layout>
 
     <div class="container-fluid py-4">
@@ -682,31 +681,49 @@
 
                                             @endswitch
 
+                                            @if ($asset->status === 'assigned' && ! $activeAssignment)
+
+                                                <div class="small text-danger mt-1">
+                                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                                    Assignment record missing
+                                                </div>
+
+                                            @endif
+
                                         </td>
 
                                         {{-- Action --}}
                                         <td class="text-end">
 
-                                            @if ($asset->status === 'assigned')
+                                            @if (auth()->user()->role === 'system_admin')
 
-                                                @if (auth()->user()->role !== 'system_admin')
+                                                <a
+                                                    href="{{ route('assets.show', $asset) }}"
+                                                    class="btn btn-outline-secondary btn-sm"
+                                                >
+                                                    <i class="bi bi-eye me-1"></i>
+                                                    View Only
+                                                </a>
 
-                                                    <a
-                                                        href="{{ route('assets.return.form', $asset) }}"
-                                                        class="btn btn-warning btn-sm"
-                                                        title="Return Asset"
-                                                    >
-                                                        <i class="bi bi-box-arrow-in-left me-1"></i>
-                                                        Return
-                                                    </a>
+                                            @elseif ($asset->status === 'available')
 
-                                                @else
+                                                <a
+                                                    href="{{ route('assets.assign', $asset) }}"
+                                                    class="btn btn-primary btn-sm"
+                                                >
+                                                    <i class="bi bi-person-plus me-1"></i>
+                                                    Assign
+                                                </a>
 
-                                                    <span class="text-muted small">
-                                                        View Only
-                                                    </span>
+                                            @elseif ($asset->status === 'assigned' && $activeAssignment)
 
-                                                @endif
+                                                <a
+                                                    href="{{ route('assets.return.form', $asset) }}"
+                                                    class="btn btn-warning btn-sm"
+                                                >
+                                                    <i class="bi bi-box-arrow-in-left me-1"></i>
+                                                    Return
+                                                </a>
 
                                             @else
 
@@ -766,4 +783,3 @@
     </div>
 
 </x-app-layout>
-```

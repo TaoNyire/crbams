@@ -1,4 +1,3 @@
-```blade
 <x-layout>
     <div class="container-fluid py-4">
 
@@ -179,12 +178,12 @@
                                 </label>
 
                                 <input
-                                    type="date"
+                                type="datetime-local"
                                     id="returned_at"
                                     name="returned_at"
                                     class="form-control @error('returned_at') is-invalid @enderror"
-                                    value="{{ old('returned_at', now()->format('Y-m-d')) }}"
-                                    max="{{ now()->format('Y-m-d') }}"
+                                value="{{ old('returned_at', now()->format('Y-m-d\\TH:i')) }}"
+                                max="{{ now()->format('Y-m-d\\TH:i') }}"
                                     required
                                 >
 
@@ -302,4 +301,3 @@
 
     </div>
 </x-layout>
-```

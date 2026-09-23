@@ -314,23 +314,13 @@
 
                     <div class="mt-4 pt-3 border-top">
 
-                        <form
-                            method="POST"
-                            action="{{ route('assets.return', $asset) }}"
-                            onsubmit="return confirm('Are you sure you want to return this asset?');"
+                        <a
+                            href="{{ route('assets.return.form', $asset) }}"
+                            class="btn btn-outline-danger"
                         >
-
-                            @csrf
-
-                            <button
-                                type="submit"
-                                class="btn btn-outline-danger"
-                            >
-                                <i class="bi bi-arrow-return-left me-1"></i>
-                                Return Asset
-                            </button>
-
-                        </form>
+                            <i class="bi bi-arrow-return-left me-1"></i>
+                            Return Asset
+                        </a>
 
                     </div>
 
@@ -501,7 +491,8 @@
                     ->with([
                         'employee',
                         'department',
-                        'assignedBy',
+                'assignedBy',
+                'returnedBy',
                     ])
                     ->latest('assigned_at')
                     ->get();
@@ -537,6 +528,10 @@
 
                                 <th>
                                     Returned At
+                                </th>
+
+                                <th>
+                                    Return Details
                                 </th>
 
                                 <th>
@@ -640,6 +635,36 @@
                                         @else
 
                                             —
+
+                                        @endif
+
+                                    </td>
+
+
+                                    {{-- RETURN DETAILS --}}
+                                    <td>
+
+                                        @if ($assignment->returned_at)
+
+                                            <div class="fw-semibold">
+                                                {{ ucfirst(str_replace('_', ' ', $assignment->returned_condition)) }}
+                                            </div>
+
+                                            <small class="text-muted d-block">
+                                                Returned by: {{ $assignment->returnedBy?->name ?? 'Unknown' }}
+                                            </small>
+
+                                            @if ($assignment->return_notes)
+
+                                                <small class="text-muted d-block">
+                                                    {{ $assignment->return_notes }}
+                                                </small>
+
+                                            @endif
+
+                                        @else
+
+                                            â€”
 
                                         @endif
 

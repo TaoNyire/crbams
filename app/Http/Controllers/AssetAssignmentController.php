@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\AssetAssignment;
 use App\Models\Department;
 use App\Models\Employee;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -37,9 +38,8 @@ class AssetAssignmentController extends Controller
                 'type',
                 'department',
                 'employee',
-                'assignments' => function ($assignmentQuery) {
+                'activeAssignment' => function ($assignmentQuery) {
                     $assignmentQuery
-                        ->whereNull('returned_at')
                         ->with([
                             'employee',
                             'department',
@@ -99,53 +99,53 @@ class AssetAssignmentController extends Controller
                     'like',
                     "%{$search}%"
                 )
-                ->orWhere(
-                    'asset_name',
-                    'like',
-                    "%{$search}%"
-                )
-                ->orWhere(
-                    'serial_number',
-                    'like',
-                    "%{$search}%"
-                )
-                ->orWhereHas(
-                    'employee',
-                    function ($employeeQuery) use ($search) {
-                        $employeeQuery
-                            ->where(
-                                'employee_number',
-                                'like',
-                                "%{$search}%"
-                            )
-                            ->orWhere(
-                                'first_name',
-                                'like',
-                                "%{$search}%"
-                            )
-                            ->orWhere(
-                                'last_name',
-                                'like',
-                                "%{$search}%"
-                            );
-                    }
-                )
-                ->orWhereHas(
-                    'department',
-                    function ($departmentQuery) use ($search) {
-                        $departmentQuery
-                            ->where(
-                                'name',
-                                'like',
-                                "%{$search}%"
-                            )
-                            ->orWhere(
-                                'code',
-                                'like',
-                                "%{$search}%"
-                            );
-                    }
-                );
+                    ->orWhere(
+                        'asset_name',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'serial_number',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhereHas(
+                        'employee',
+                        function ($employeeQuery) use ($search) {
+                            $employeeQuery
+                                ->where(
+                                    'employee_number',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'first_name',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'last_name',
+                                    'like',
+                                    "%{$search}%"
+                                );
+                        }
+                    )
+                    ->orWhereHas(
+                        'department',
+                        function ($departmentQuery) use ($search) {
+                            $departmentQuery
+                                ->where(
+                                    'name',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'code',
+                                    'like',
+                                    "%{$search}%"
+                                );
+                        }
+                    );
             });
         }
 
@@ -296,16 +296,10 @@ class AssetAssignmentController extends Controller
         $this->ensureCanAssignAssets();
         $this->ensureAssetIsAccessible($asset);
 
-        abort_if(
-            $asset->status === 'retired',
+        abort_unless(
+            $asset->status === 'available',
             422,
-            'A retired asset cannot be assigned.'
-        );
-
-        abort_if(
-            $asset->status === 'assigned',
-            422,
-            'This asset is already assigned.'
+            'Only available assets can be assigned.'
         );
 
         $departments = Department::where('is_active', true)
@@ -337,21 +331,6 @@ class AssetAssignmentController extends Controller
     {
         $this->ensureCanAssignAssets();
         $this->ensureAssetIsAccessible($asset);
-
-        abort_if(
-            $asset->status === 'retired',
-            422,
-            'A retired asset cannot be assigned.'
-        );
-
-        if ($asset->status === 'assigned') {
-            return redirect()
-                ->route('assets.show', $asset)
-                ->with(
-                    'error',
-                    'This asset is already assigned.'
-                );
-        }
 
         $validated = $request->validate([
             'employee_id' => [
@@ -407,8 +386,18 @@ class AssetAssignmentController extends Controller
             $department,
             $validated
         ) {
+            $lockedAsset = Asset::query()
+                ->lockForUpdate()
+                ->findOrFail($asset->id);
+
+            abort_unless(
+                $lockedAsset->status === 'available',
+                422,
+                'Only available assets can be assigned.'
+            );
+
             AssetAssignment::create([
-                'asset_id' => $asset->id,
+                'asset_id' => $lockedAsset->id,
                 'employee_id' => $employee->id,
                 'department_id' => $department->id,
                 'assigned_by' => auth()->id(),
@@ -419,14 +408,12 @@ class AssetAssignmentController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            $asset->update([
+            $lockedAsset->update([
                 'employee_id' => $employee->id,
                 'department_id' => $department->id,
                 'location' => $validated['location']
                     ?? $asset->location,
                 'status' => 'assigned',
-                'notes' => $validated['notes']
-                    ?? $asset->notes,
             ]);
         });
 
@@ -434,9 +421,9 @@ class AssetAssignmentController extends Controller
             ->route('assets.show', $asset)
             ->with(
                 'success',
-                'Asset successfully assigned to ' .
-                $employee->first_name . ' ' .
-                $employee->last_name . '.'
+                'Asset successfully assigned to '.
+                $employee->first_name.' '.
+                $employee->last_name.'.'
             );
     }
 
@@ -501,7 +488,6 @@ class AssetAssignmentController extends Controller
             'returned_at' => [
                 'required',
                 'date',
-                'before_or_equal:today',
             ],
 
             'returned_condition' => [
@@ -520,12 +506,38 @@ class AssetAssignmentController extends Controller
             $asset,
             $validated
         ) {
-            $currentAssignment = $asset->activeAssignment()->first();
+            $lockedAsset = Asset::query()
+                ->lockForUpdate()
+                ->findOrFail($asset->id);
+
+            abort_unless(
+                $lockedAsset->status === 'assigned',
+                422,
+                'This asset is not currently assigned.'
+            );
+
+            $currentAssignment = $lockedAsset->activeAssignment()
+                ->lockForUpdate()
+                ->first();
 
             abort_unless(
                 $currentAssignment,
                 422,
                 'No active assignment was found for this asset.'
+            );
+
+            $returnedAt = Carbon::parse($validated['returned_at']);
+
+            abort_if(
+                $returnedAt->isFuture(),
+                422,
+                'The returned date cannot be in the future.'
+            );
+
+            abort_if(
+                $returnedAt->lt($currentAssignment->assigned_at),
+                422,
+                'The returned date cannot be before the assignment date.'
             );
 
             /*
@@ -535,7 +547,8 @@ class AssetAssignmentController extends Controller
             */
 
             $currentAssignment->update([
-                'returned_at' => $validated['returned_at'],
+                'returned_at' => $returnedAt,
+                'returned_by' => auth()->id(),
                 'returned_condition' => $validated['returned_condition'],
                 'return_notes' => $validated['return_notes'] ?? null,
             ]);
@@ -556,7 +569,7 @@ class AssetAssignmentController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $asset->update([
+            $lockedAsset->update([
                 'employee_id' => null,
                 'department_id' => null,
                 'status' => $newStatus,

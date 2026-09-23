@@ -14,6 +14,7 @@ class AssetAssignment extends Model
         'assigned_by',
         'assigned_at',
         'returned_at',
+        'returned_by',
         'returned_condition',
         'return_notes',
         'notes',
@@ -42,6 +43,11 @@ class AssetAssignment extends Model
     public function assignedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_by');
+    }
+
+    public function returnedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'returned_by');
     }
 
     public function getIsActiveAttribute(): bool

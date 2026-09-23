@@ -1,4 +1,3 @@
-```blade
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -19,7 +18,7 @@
             margin: 0;
             min-height: 100vh;
             font-family: "Segoe UI", Arial, sans-serif;
-            background: #f4f7fb;
+            background: #e9efed;
         }
 
         .login-wrapper {
@@ -31,7 +30,7 @@
 
         .login-brand {
             width: 52%;
-            background: linear-gradient(135deg, #0b1f3a 0%, #123d68 55%, #1769aa 100%);
+            background: linear-gradient(135deg, #174c49 0%, #1d625f 55%, #246d69 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -131,7 +130,7 @@
             align-items: center;
             justify-content: center;
             padding: 40px;
-            background: #ffffff;
+            background: #f5f8f7;
         }
 
         .login-box {
@@ -146,13 +145,13 @@
         .login-header h2 {
             margin: 0 0 10px;
             font-size: 30px;
-            color: #172033;
+            color: #174c49;
             font-weight: 700;
         }
 
         .login-header p {
             margin: 0;
-            color: #718096;
+            color: #788684;
             font-size: 15px;
         }
 
@@ -178,7 +177,7 @@
             margin-bottom: 8px;
             font-size: 14px;
             font-weight: 600;
-            color: #344054;
+            color: #536360;
         }
 
         .input-wrapper {
@@ -188,19 +187,19 @@
         .form-input {
             width: 100%;
             height: 50px;
-            border: 1px solid #d9e0ea;
+            border: 1px solid #dbe4e1;
             border-radius: 10px;
             padding: 0 15px;
             font-size: 15px;
-            color: #172033;
+            color: #263238;
             background: #ffffff;
             outline: none;
             transition: all 0.2s ease;
         }
 
         .form-input:focus {
-            border-color: #1769aa;
-            box-shadow: 0 0 0 4px rgba(23,105,170,0.1);
+            border-color: #246d69;
+            box-shadow: 0 0 0 4px rgba(36,109,105,0.12);
         }
 
         .password-input {
@@ -214,14 +213,14 @@
             transform: translateY(-50%);
             border: none;
             background: transparent;
-            color: #667085;
+            color: #788684;
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
         }
 
         .password-toggle:hover {
-            color: #1769aa;
+            color: #246d69;
         }
 
         .form-options {
@@ -235,18 +234,18 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #667085;
+            color: #788684;
             font-size: 14px;
         }
 
         .remember input {
             width: 16px;
             height: 16px;
-            accent-color: #1769aa;
+            accent-color: #246d69;
         }
 
         .forgot-password {
-            color: #1769aa;
+            color: #246d69;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
@@ -261,27 +260,27 @@
             height: 51px;
             border: none;
             border-radius: 10px;
-            background: #1769aa;
+            background: #246d69;
             color: white;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 5px 14px rgba(23,105,170,0.2);
+            box-shadow: 0 5px 14px rgba(36,109,105,0.22);
         }
 
         .login-button:hover {
-            background: #12588e;
+            background: #1d625f;
             transform: translateY(-1px);
-            box-shadow: 0 7px 18px rgba(23,105,170,0.25);
+            box-shadow: 0 7px 18px rgba(36,109,105,0.28);
         }
 
         .login-footer {
             margin-top: 35px;
             padding-top: 22px;
-            border-top: 1px solid #edf0f5;
+            border-top: 1px solid #dbe4e1;
             text-align: center;
-            color: #98a2b3;
+            color: #788684;
             font-size: 12px;
             line-height: 1.6;
         }
@@ -292,7 +291,7 @@
             align-items: center;
             gap: 7px;
             margin-top: 8px;
-            color: #667085;
+            color: #536360;
         }
 
         /* MOBILE */
@@ -577,4 +576,3 @@ function togglePassword() {
 
 </body>
 </html>
-```

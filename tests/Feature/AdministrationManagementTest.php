@@ -28,6 +28,12 @@ test('administration officers only see assets and categories from their manageme
         ->assertForbidden();
 
     $this->actingAs($administrationOfficer)
+        ->get(route('assets.edit', $administrationAsset))
+        ->assertOk()
+        ->assertSee('Asset Information')
+        ->assertSee('Save Changes');
+
+    $this->actingAs($administrationOfficer)
         ->get(route('asset-categories.index'))
         ->assertOk()
         ->assertSee($administrationAsset->category->name)

@@ -187,7 +187,6 @@ class AssetController extends Controller
         ]);
     }
 
-
     /**
      * Show the form for creating a new asset.
      */
@@ -227,7 +226,6 @@ class AssetController extends Controller
             'employees'
         ));
     }
-
 
     /**
      * Store a newly created asset.
@@ -359,7 +357,6 @@ class AssetController extends Controller
             ->with('success', 'Asset successfully created.');
     }
 
-
     /**
      * Display the specified asset.
      */
@@ -376,7 +373,6 @@ class AssetController extends Controller
 
         return view('assets.show', compact('asset'));
     }
-
 
     /**
      * Display a printable QR tag for one asset.
@@ -411,7 +407,6 @@ class AssetController extends Controller
             'assetUrl'
         ));
     }
-
 
     /**
      * Display printable QR tags for multiple assets.
@@ -467,7 +462,6 @@ class AssetController extends Controller
         return view('assets.tags-bulk', compact('assets'));
     }
 
-
     /**
      * Show the form for editing the specified asset.
      */
@@ -504,7 +498,6 @@ class AssetController extends Controller
             'employees'
         ));
     }
-
 
     /**
      * Update the specified asset.
@@ -630,7 +623,6 @@ class AssetController extends Controller
             ->with('success', 'Asset successfully updated.');
     }
 
-
     /**
      * Remove the specified asset.
      */
@@ -640,13 +632,21 @@ class AssetController extends Controller
 
         $this->ensureAssetIsAccessible($asset);
 
+        if ($asset->assignments()->exists()) {
+            return redirect()
+                ->route('assets.show', $asset)
+                ->with(
+                    'error',
+                    'Assets with assignment history cannot be deleted.'
+                );
+        }
+
         $asset->delete();
 
         return redirect()
             ->route('assets.index')
             ->with('success', 'Asset successfully deleted.');
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -670,7 +670,6 @@ class AssetController extends Controller
             'You are not authorized to manage assets.'
         );
     }
-
 
     /**
      * Return assets accessible to the current user.
@@ -714,7 +713,6 @@ class AssetController extends Controller
             });
     }
 
-
     /**
      * Return asset categories accessible to the current user.
      */
@@ -745,7 +743,6 @@ class AssetController extends Controller
             );
     }
 
-
     /**
      * Ensure the selected category belongs to the user's management area.
      */
@@ -771,7 +768,6 @@ class AssetController extends Controller
         );
     }
 
-
     /**
      * Ensure an asset type belongs to the selected category.
      */
@@ -790,7 +786,6 @@ class AssetController extends Controller
             'The selected asset type does not belong to the selected category.'
         );
     }
-
 
     /**
      * Ensure the current user can access the asset.
@@ -829,7 +824,6 @@ class AssetController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Asset Code
@@ -850,7 +844,7 @@ class AssetController extends Controller
             : 1;
 
         do {
-            $assetCode = 'CRB-' . str_pad(
+            $assetCode = 'CRB-'.str_pad(
                 $nextNumber,
                 5,
                 '0',
