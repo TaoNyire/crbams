@@ -204,14 +204,17 @@ class AssetAssignmentController extends Controller
 
         $assignedAssets = (clone $statisticsQuery)
             ->where('status', 'assigned')
+            ->whereHas('activeAssignment')
             ->count();
 
         $availableAssets = (clone $statisticsQuery)
             ->where('status', 'available')
+            ->whereDoesntHave('activeAssignment')
             ->count();
 
         $underRepairAssets = (clone $statisticsQuery)
             ->where('status', 'under_repair')
+            ->whereDoesntHave('activeAssignment')
             ->count();
 
         $retiredAssets = (clone $statisticsQuery)
@@ -300,6 +303,12 @@ class AssetAssignmentController extends Controller
             $asset->status === 'available',
             422,
             'Only available assets can be assigned.'
+        );
+
+        abort_unless(
+            ! $asset->activeAssignment()->exists(),
+            422,
+            'This asset already has an active assignment.'
         );
 
         $departments = Department::where('is_active', true)
@@ -396,6 +405,12 @@ class AssetAssignmentController extends Controller
                 'Only available assets can be assigned.'
             );
 
+            abort_unless(
+                ! $lockedAsset->activeAssignment()->exists(),
+                422,
+                'This asset already has an active assignment.'
+            );
+
             AssetAssignment::create([
                 'asset_id' => $lockedAsset->id,
                 'employee_id' => $employee->id,
@@ -438,12 +453,6 @@ class AssetAssignmentController extends Controller
         $this->ensureCanAssignAssets();
         $this->ensureAssetIsAccessible($asset);
 
-        abort_unless(
-            $asset->status === 'assigned',
-            422,
-            'This asset is not currently assigned.'
-        );
-
         $assignment = $asset->activeAssignment()
             ->with([
                 'employee',
@@ -456,6 +465,12 @@ class AssetAssignmentController extends Controller
             $assignment,
             422,
             'No active assignment was found for this asset.'
+        );
+
+        abort_unless(
+            $asset->status === 'assigned',
+            422,
+            'This asset has an active assignment but its status is not Assigned.'
         );
 
         return view(
@@ -477,12 +492,6 @@ class AssetAssignmentController extends Controller
     {
         $this->ensureCanAssignAssets();
         $this->ensureAssetIsAccessible($asset);
-
-        abort_unless(
-            $asset->status === 'assigned',
-            422,
-            'This asset is not currently assigned.'
-        );
 
         $validated = $request->validate([
             'returned_at' => [
@@ -510,12 +519,6 @@ class AssetAssignmentController extends Controller
                 ->lockForUpdate()
                 ->findOrFail($asset->id);
 
-            abort_unless(
-                $lockedAsset->status === 'assigned',
-                422,
-                'This asset is not currently assigned.'
-            );
-
             $currentAssignment = $lockedAsset->activeAssignment()
                 ->lockForUpdate()
                 ->first();
@@ -524,6 +527,12 @@ class AssetAssignmentController extends Controller
                 $currentAssignment,
                 422,
                 'No active assignment was found for this asset.'
+            );
+
+            abort_unless(
+                $lockedAsset->status === 'assigned',
+                422,
+                'This asset has an active assignment but its status is not Assigned.'
             );
 
             $returnedAt = Carbon::parse($validated['returned_at']);

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
-use App\Models\AssetType;
 use App\Models\Department;
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,27 +14,35 @@ class AssetController extends Controller
 {
     /**
      * Display a listing of assets.
+     *
+     * System Administrator:
+     * - Can view ALL assets.
+     *
+     * Hardware Officer:
+     * - Can view Hardware assets only.
+     *
+     * Administration Officer:
+     * - Can view Administration assets only.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
-        $query = $this->assetsForCurrentUser()
-            ->with([
-                'category',
-                'type',
-                'department',
-                'employee',
-            ]);
+        $query = $this->assetsForCurrentUser()->with([
+            'category',
+            'type',
+            'department',
+            'employee',
+        ]);
 
         /*
         |--------------------------------------------------------------------------
-        | Search
+        | SEARCH
         |--------------------------------------------------------------------------
         */
 
         if ($request->filled('search')) {
-            $search = trim($request->search);
+            $search = $request->search;
 
-            $query->where(function (Builder $q) use ($search) {
+            $query->where(function (Builder $q) use ($search): void {
                 $q->where('asset_code', 'like', "%{$search}%")
                     ->orWhere('asset_name', 'like', "%{$search}%")
                     ->orWhere('serial_number', 'like', "%{$search}%")
@@ -45,7 +52,7 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Filters
+        | STATUS FILTER
         |--------------------------------------------------------------------------
         */
 
@@ -53,9 +60,21 @@ class AssetController extends Controller
             $query->where('status', $request->status);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | CATEGORY FILTER
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->filled('category')) {
             $query->where('asset_category_id', $request->category);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DEPARTMENT FILTER
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('department')) {
             $query->where('department_id', $request->department);
@@ -63,36 +82,7 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Management Area Filter
-        |--------------------------------------------------------------------------
-        | Used by the System Administrator dashboard.
-        |
-        | System Administrator can filter all assets by:
-        | - hardware
-        | - administration
-        |
-        | Operational officers cannot use this filter to bypass
-        | their existing access restrictions because the base query
-        | is already restricted by assetsForCurrentUser().
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $request->filled('management_area') &&
-            auth()->user()->role === 'system_admin'
-        ) {
-            $managementArea = $request->management_area;
-
-            if (in_array($managementArea, ['hardware', 'administration'], true)) {
-                $query->whereHas('category', function (Builder $q) use ($managementArea) {
-                    $q->where('responsible_officer', $managementArea);
-                });
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Pagination
+        | GET ASSETS
         |--------------------------------------------------------------------------
         */
 
@@ -103,122 +93,80 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Filter Data
+        | FILTER OPTIONS
         |--------------------------------------------------------------------------
         */
 
         $categories = $this->categoriesForCurrentUser()
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
-        $departments = Department::orderBy('name')->get();
+        $departments = Department::where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
         /*
         |--------------------------------------------------------------------------
-        | Statistics
+        | STATISTICS
         |--------------------------------------------------------------------------
         */
 
-        $accessibleAssets = $this->assetsForCurrentUser();
+        $statisticsQuery = $this->assetsForCurrentUser();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Apply Management Area to Statistics
-        |--------------------------------------------------------------------------
-        | This keeps the statistics consistent with the assets currently
-        | being displayed when the System Administrator clicks a
-        | management-area dashboard card.
-        |--------------------------------------------------------------------------
-        */
+        $totalAssets = (clone $statisticsQuery)->count();
 
-        if (
-            $request->filled('management_area') &&
-            auth()->user()->role === 'system_admin'
-        ) {
-            $managementArea = $request->management_area;
-
-            if (in_array($managementArea, ['hardware', 'administration'], true)) {
-                $accessibleAssets->whereHas(
-                    'category',
-                    function (Builder $q) use ($managementArea) {
-                        $q->where(
-                            'responsible_officer',
-                            $managementArea
-                        );
-                    }
-                );
-            }
-        }
-
-        $totalAssets = (clone $accessibleAssets)->count();
-
-        $availableAssets = (clone $accessibleAssets)
+        $availableAssets = (clone $statisticsQuery)
             ->where('status', 'available')
             ->count();
 
-        $assignedAssets = (clone $accessibleAssets)
+        $assignedAssets = (clone $statisticsQuery)
             ->where('status', 'assigned')
             ->count();
 
-        $repairAssets = (clone $accessibleAssets)
+        $underRepairAssets = (clone $statisticsQuery)
             ->where('status', 'under_repair')
             ->count();
 
-        $retiredAssets = (clone $accessibleAssets)
+        $retiredAssets = (clone $statisticsQuery)
             ->where('status', 'retired')
             ->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Return View
-        |--------------------------------------------------------------------------
-        */
-
-        return view('assets.index', [
-            'assets' => $assets,
-            'categories' => $categories,
-            'departments' => $departments,
-
-            'totalAssets' => $totalAssets,
-            'availableAssets' => $availableAssets,
-            'assignedAssets' => $assignedAssets,
-            'repairAssets' => $repairAssets,
-            'retiredAssets' => $retiredAssets,
-        ]);
+        return view('assets.index', compact(
+            'assets',
+            'categories',
+            'departments',
+            'totalAssets',
+            'availableAssets',
+            'assignedAssets',
+            'underRepairAssets',
+            'retiredAssets'
+        ));
     }
 
     /**
      * Show the form for creating a new asset.
+     *
+     * System Administrator is NOT allowed to create assets.
      */
-    public function create(): View
+    public function create()
     {
         $this->ensureCanManageAssets();
 
         $categories = $this->categoriesForCurrentUser()
+            ->where('is_active', true)
+            ->with('assetTypes')
             ->orderBy('name')
             ->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Departments
-        |--------------------------------------------------------------------------
-        | No status filter because the departments table does not have
-        | a status column.
-        |--------------------------------------------------------------------------
-        */
+        $departments = Department::where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        $departments = Department::orderBy('name')->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Employees
-        |--------------------------------------------------------------------------
-        | No status filter because the employees table may not have
-        | a status column.
-        |--------------------------------------------------------------------------
-        */
-
-        $employees = Employee::orderBy('last_name')->get();
+        $employees = Employee::with('department')
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
 
         return view('assets.create', compact(
             'categories',
@@ -229,16 +177,32 @@ class AssetController extends Controller
 
     /**
      * Store a newly created asset.
+     *
+     * System Administrator is NOT allowed to create assets.
      */
     public function store(Request $request)
     {
         $this->ensureCanManageAssets();
 
         $validated = $request->validate([
+            'asset_code' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:assets,asset_code',
+            ],
+
             'asset_name' => [
                 'required',
                 'string',
                 'max:255',
+            ],
+
+            'serial_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                'unique:assets,serial_number',
             ],
 
             'asset_category_id' => [
@@ -249,35 +213,6 @@ class AssetController extends Controller
             'asset_type_id' => [
                 'required',
                 'exists:asset_types,id',
-            ],
-
-            'serial_number' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'barcode' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'purchase_date' => [
-                'nullable',
-                'date',
-            ],
-
-            'purchase_cost' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'supplier' => [
-                'nullable',
-                'string',
-                'max:255',
             ],
 
             'department_id' => [
@@ -296,18 +231,41 @@ class AssetController extends Controller
                 'max:255',
             ],
 
-            'status' => [
-                'required',
-                'in:available,assigned,under_repair,retired',
+            'purchase_date' => [
+                'nullable',
+                'date',
             ],
 
-            'condition' => [
+            'purchase_price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
+            'supplier' => [
                 'nullable',
                 'string',
                 'max:255',
             ],
 
-            'description' => [
+            'condition' => [
+                'required',
+                'in:new,good,fair,poor,damaged',
+            ],
+
+            'status' => [
+                'required',
+                'in:available,assigned,under_repair,disposed,lost,retired',
+            ],
+
+            'barcode' => [
+                'nullable',
+                'string',
+                'max:255',
+                'unique:assets,barcode',
+            ],
+
+            'notes' => [
                 'nullable',
                 'string',
             ],
@@ -315,52 +273,60 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Category Access
+        | MANAGEMENT AREA VALIDATION
         |--------------------------------------------------------------------------
         */
 
-        $category = AssetCategory::findOrFail(
-            $validated['asset_category_id']
+        $this->ensureCategoryIsAccessible(
+            (int) $validated['asset_category_id']
         );
-
-        $this->ensureCategoryIsAccessible($category);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Asset Type Validation
-        |--------------------------------------------------------------------------
-        */
 
         $this->ensureAssetTypeMatchesCategory(
-            $validated['asset_type_id'],
-            $category->id
+            (int) $validated['asset_type_id'],
+            (int) $validated['asset_category_id']
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Generate Asset Code
+        | ASSET ASSIGNMENT VALIDATION
         |--------------------------------------------------------------------------
         */
 
-        $validated['asset_code'] = $this->generateAssetCode();
+        if (
+            $validated['status'] === 'assigned'
+            && empty($validated['employee_id'])
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'employee_id' =>
+                        'An employee must be selected when an asset is assigned.',
+                ]);
+        }
 
         /*
         |--------------------------------------------------------------------------
-        | Create Asset
+        | CLEAR EMPLOYEE WHEN NOT ASSIGNED
         |--------------------------------------------------------------------------
         */
+
+        if ($validated['status'] !== 'assigned') {
+            $validated['employee_id'] = null;
+        }
 
         Asset::create($validated);
 
         return redirect()
             ->route('assets.index')
-            ->with('success', 'Asset successfully created.');
+            ->with('success', 'Asset registered successfully.');
     }
 
     /**
      * Display the specified asset.
+     *
+     * System Administrator can view all assets.
      */
-    public function show(Asset $asset): View
+    public function show(Asset $asset)
     {
         $this->ensureAssetIsAccessible($asset);
 
@@ -375,7 +341,11 @@ class AssetController extends Controller
     }
 
     /**
-     * Display a printable QR tag for one asset.
+     * Display a printable QR asset tag.
+     *
+     * All authorized users who can view the asset can print its tag.
+     *
+     * The QR code contains only the asset record URL.
      */
     public function tag(Asset $asset): View
     {
@@ -388,18 +358,6 @@ class AssetController extends Controller
             'employee',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | QR Destination
-        |--------------------------------------------------------------------------
-        |
-        | The QR code currently points to the asset record.
-        |
-        | We will later replace this with a dedicated secure scan route
-        | so that the physical CRB asset tag can be scanned safely.
-        |--------------------------------------------------------------------------
-        */
-
         $assetUrl = route('assets.show', $asset);
 
         return view('assets.tag', compact(
@@ -409,87 +367,30 @@ class AssetController extends Controller
     }
 
     /**
-     * Display printable QR tags for multiple assets.
-     */
-    public function bulkTags(Request $request): View
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | Get Selected Asset IDs
-        |--------------------------------------------------------------------------
-        */
-
-        $ids = collect($request->input('assets', []))
-            ->map(fn ($id) => (int) $id)
-            ->filter()
-            ->unique()
-            ->values();
-
-        abort_if(
-            $ids->isEmpty(),
-            422,
-            'Please select at least one asset.'
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Get Accessible Assets
-        |--------------------------------------------------------------------------
-        */
-
-        $assets = $this->assetsForCurrentUser()
-            ->whereIn('id', $ids)
-            ->with([
-                'category',
-                'type',
-                'department',
-                'employee',
-            ])
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Security Check
-        |--------------------------------------------------------------------------
-        */
-
-        abort_if(
-            $assets->count() !== $ids->count(),
-            403,
-            'One or more selected assets are not accessible.'
-        );
-
-        return view('assets.tags-bulk', compact('assets'));
-    }
-
-    /**
      * Show the form for editing the specified asset.
+     *
+     * System Administrator is NOT allowed to edit assets.
      */
-    public function edit(Asset $asset): View
+    public function edit(Asset $asset)
     {
         $this->ensureCanManageAssets();
 
         $this->ensureAssetIsAccessible($asset);
 
         $categories = $this->categoriesForCurrentUser()
+            ->where('is_active', true)
+            ->with('assetTypes')
             ->orderBy('name')
             ->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Departments
-        |--------------------------------------------------------------------------
-        */
+        $departments = Department::where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        $departments = Department::orderBy('name')->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Employees
-        |--------------------------------------------------------------------------
-        */
-
-        $employees = Employee::orderBy('last_name')->get();
+        $employees = Employee::with('department')
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
 
         return view('assets.edit', compact(
             'asset',
@@ -501,6 +402,8 @@ class AssetController extends Controller
 
     /**
      * Update the specified asset.
+     *
+     * System Administrator is NOT allowed to update assets.
      */
     public function update(Request $request, Asset $asset)
     {
@@ -509,10 +412,24 @@ class AssetController extends Controller
         $this->ensureAssetIsAccessible($asset);
 
         $validated = $request->validate([
+            'asset_code' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:assets,asset_code,' . $asset->id,
+            ],
+
             'asset_name' => [
                 'required',
                 'string',
                 'max:255',
+            ],
+
+            'serial_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                'unique:assets,serial_number,' . $asset->id,
             ],
 
             'asset_category_id' => [
@@ -523,35 +440,6 @@ class AssetController extends Controller
             'asset_type_id' => [
                 'required',
                 'exists:asset_types,id',
-            ],
-
-            'serial_number' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'barcode' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'purchase_date' => [
-                'nullable',
-                'date',
-            ],
-
-            'purchase_cost' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'supplier' => [
-                'nullable',
-                'string',
-                'max:255',
             ],
 
             'department_id' => [
@@ -570,18 +458,41 @@ class AssetController extends Controller
                 'max:255',
             ],
 
-            'status' => [
-                'required',
-                'in:available,assigned,under_repair,retired',
+            'purchase_date' => [
+                'nullable',
+                'date',
             ],
 
-            'condition' => [
+            'purchase_price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
+            'supplier' => [
                 'nullable',
                 'string',
                 'max:255',
             ],
 
-            'description' => [
+            'condition' => [
+                'required',
+                'in:new,good,fair,poor,damaged',
+            ],
+
+            'status' => [
+                'required',
+                'in:available,assigned,under_repair,disposed,lost,retired',
+            ],
+
+            'barcode' => [
+                'nullable',
+                'string',
+                'max:255',
+                'unique:assets,barcode,' . $asset->id,
+            ],
+
+            'notes' => [
                 'nullable',
                 'string',
             ],
@@ -589,42 +500,58 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Category Access
+        | MANAGEMENT AREA VALIDATION
         |--------------------------------------------------------------------------
         */
 
-        $category = AssetCategory::findOrFail(
-            $validated['asset_category_id']
+        $this->ensureCategoryIsAccessible(
+            (int) $validated['asset_category_id']
         );
-
-        $this->ensureCategoryIsAccessible($category);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Asset Type Validation
-        |--------------------------------------------------------------------------
-        */
 
         $this->ensureAssetTypeMatchesCategory(
-            $validated['asset_type_id'],
-            $category->id
+            (int) $validated['asset_type_id'],
+            (int) $validated['asset_category_id']
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Update
+        | ASSET ASSIGNMENT VALIDATION
         |--------------------------------------------------------------------------
         */
+
+        if (
+            $validated['status'] === 'assigned'
+            && empty($validated['employee_id'])
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'employee_id' =>
+                        'An employee must be selected when an asset is assigned.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CLEAR EMPLOYEE WHEN NOT ASSIGNED
+        |--------------------------------------------------------------------------
+        */
+
+        if ($validated['status'] !== 'assigned') {
+            $validated['employee_id'] = null;
+        }
 
         $asset->update($validated);
 
         return redirect()
             ->route('assets.show', $asset)
-            ->with('success', 'Asset successfully updated.');
+            ->with('success', 'Asset updated successfully.');
     }
 
     /**
-     * Remove the specified asset.
+     * Retire the specified asset.
+     *
+     * System Administrator is NOT allowed to retire assets.
      */
     public function destroy(Asset $asset)
     {
@@ -632,65 +559,64 @@ class AssetController extends Controller
 
         $this->ensureAssetIsAccessible($asset);
 
-        if ($asset->assignments()->exists()) {
-            return redirect()
-                ->route('assets.show', $asset)
-                ->with(
-                    'error',
-                    'Assets with assignment history cannot be deleted.'
-                );
-        }
-
-        $asset->delete();
+        $asset->update([
+            'status' => 'retired',
+            'employee_id' => null,
+        ]);
 
         return redirect()
             ->route('assets.index')
-            ->with('success', 'Asset successfully deleted.');
+            ->with('success', 'Asset retired successfully.');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Access Control
+    | ACCESS CONTROL
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Ensure the current user is allowed to manage assets.
+     * Ensure the current user can perform operational asset management.
+     *
+     * System Administrator has READ-ONLY access to assets.
      */
-    protected function ensureCanManageAssets(): void
+    private function ensureCanManageAssets(): void
     {
         $user = auth()->user();
 
         abort_unless(
-            in_array($user->role, [
-                'hardware_officer',
-                'administration_officer',
-            ]),
+            in_array(
+                $user->role,
+                [
+                    'hardware_officer',
+                    'administration_officer',
+                ],
+                true
+            ),
             403,
-            'You are not authorized to manage assets.'
+            'System Administrators have read-only access to assets.'
         );
     }
 
     /**
-     * Return assets accessible to the current user.
+     * Get assets available to the current user.
      *
      * System Administrator:
-     * - Can view all assets.
-     * - Cannot create, edit, delete or assign assets.
+     * - All assets.
      *
      * Hardware Officer:
-     * - Can access hardware/IT assets.
+     * - Hardware assets only.
      *
      * Administration Officer:
-     * - Can access administration assets.
+     * - Administration assets only.
      */
-    protected function assetsForCurrentUser()
+    private function assetsForCurrentUser(): Builder
     {
         $user = auth()->user();
 
         /*
         |--------------------------------------------------------------------------
-        | System Administrator
+        | SYSTEM ADMINISTRATOR
         |--------------------------------------------------------------------------
         */
 
@@ -700,29 +626,38 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Operational Officers
+        | OPERATIONAL OFFICERS
         |--------------------------------------------------------------------------
         */
 
+        abort_unless(
+            $user->management_area,
+            403,
+            'No management area has been assigned to this user.'
+        );
+
         return Asset::query()
-            ->whereHas('category', function (Builder $query) use ($user) {
-                $query->where(
-                    'responsible_officer',
-                    $user->management_area
-                );
-            });
+            ->whereHas(
+                'category',
+                function (Builder $query) use ($user): void {
+                    $query->where(
+                        'responsible_officer',
+                        $user->management_area
+                    );
+                }
+            );
     }
 
     /**
-     * Return asset categories accessible to the current user.
+     * Get categories available to the current user.
      */
-    protected function categoriesForCurrentUser()
+    private function categoriesForCurrentUser(): Builder
     {
         $user = auth()->user();
 
         /*
         |--------------------------------------------------------------------------
-        | System Administrator
+        | SYSTEM ADMINISTRATOR
         |--------------------------------------------------------------------------
         */
 
@@ -732,9 +667,15 @@ class AssetController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Operational Officers
+        | OPERATIONAL OFFICERS
         |--------------------------------------------------------------------------
         */
+
+        abort_unless(
+            $user->management_area,
+            403,
+            'No management area has been assigned to this user.'
+        );
 
         return AssetCategory::query()
             ->where(
@@ -744,121 +685,56 @@ class AssetController extends Controller
     }
 
     /**
-     * Ensure the selected category belongs to the user's management area.
+     * Ensure the selected category belongs to the
+     * current user's management area.
      */
-    protected function ensureCategoryIsAccessible(
-        AssetCategory $category
-    ): void {
-        $user = auth()->user();
-
-        /*
-        |--------------------------------------------------------------------------
-        | System Administrator
-        |--------------------------------------------------------------------------
-        */
-
-        if ($user->role === 'system_admin') {
-            return;
-        }
-
+    private function ensureCategoryIsAccessible(int $categoryId): void
+    {
         abort_unless(
-            $category->responsible_officer === $user->management_area,
+            $this->categoriesForCurrentUser()
+                ->whereKey($categoryId)
+                ->exists(),
             403,
-            'You are not authorized to manage this asset category.'
+            'You are not authorized to manage assets in this category.'
         );
     }
 
     /**
-     * Ensure an asset type belongs to the selected category.
+     * Ensure an asset type belongs to its submitted category.
      */
-    protected function ensureAssetTypeMatchesCategory(
+    private function ensureAssetTypeMatchesCategory(
         int $assetTypeId,
         int $categoryId
     ): void {
-        $exists = AssetType::query()
-            ->where('id', $assetTypeId)
-            ->where('asset_category_id', $categoryId)
-            ->exists();
-
         abort_unless(
-            $exists,
+            AssetCategory::query()
+                ->whereKey($categoryId)
+                ->whereHas(
+                    'assetTypes',
+                    function (Builder $query) use ($assetTypeId): void {
+                        $query->whereKey($assetTypeId);
+                    }
+                )
+                ->exists(),
             422,
             'The selected asset type does not belong to the selected category.'
         );
     }
 
     /**
-     * Ensure the current user can access the asset.
+     * Ensure the requested asset belongs to the current user's
+     * management area.
+     *
+     * System Administrator can access all assets for viewing.
      */
-    protected function ensureAssetIsAccessible(Asset $asset): void
+    private function ensureAssetIsAccessible(Asset $asset): void
     {
-        $user = auth()->user();
-
-        /*
-        |--------------------------------------------------------------------------
-        | System Administrator
-        |--------------------------------------------------------------------------
-        |
-        | System Administrator has read-only visibility of all assets.
-        |
-        */
-
-        if ($user->role === 'system_admin') {
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Operational User
-        |--------------------------------------------------------------------------
-        */
-
-        $accessible = $this->assetsForCurrentUser()
-            ->whereKey($asset->id)
-            ->exists();
-
         abort_unless(
-            $accessible,
+            $this->assetsForCurrentUser()
+                ->whereKey($asset->id)
+                ->exists(),
             403,
             'You are not authorized to access this asset.'
         );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Asset Code
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Generate a unique CRB asset code.
-     */
-    protected function generateAssetCode(): string
-    {
-        $lastAsset = Asset::query()
-            ->latest('id')
-            ->first();
-
-        $nextNumber = $lastAsset
-            ? $lastAsset->id + 1
-            : 1;
-
-        do {
-            $assetCode = 'CRB-'.str_pad(
-                $nextNumber,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
-
-            $exists = Asset::where(
-                'asset_code',
-                $assetCode
-            )->exists();
-
-            $nextNumber++;
-        } while ($exists);
-
-        return $assetCode;
     }
 }

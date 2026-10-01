@@ -1,4 +1,4 @@
-<x-layout>
+<x-app-layout>
     <div class="container-fluid py-4">
 
         {{-- Page Header --}}
@@ -300,4 +300,4 @@
         </div>
 
     </div>
-</x-layout>
+</x-app-layout>

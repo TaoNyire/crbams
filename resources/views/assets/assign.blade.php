@@ -1,7 +1,5 @@
-@extends('layouts.app')
 
-@section('content')
-
+<x-app-layout>
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -273,4 +271,4 @@
 
 </div>
 
-@endsection
+</x-app-layout>
